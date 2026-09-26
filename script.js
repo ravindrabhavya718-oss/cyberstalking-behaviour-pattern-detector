@@ -217,3 +217,62 @@ if (document.getElementById('logoutBtn')) {
     location.href = 'login.html';
   });
 }
+
+function bindUtilityButtons() {
+  document.querySelectorAll('.nav-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      const label = (button.textContent || '').replace(/\d+/, '').trim();
+      document.querySelectorAll('.nav-btn').forEach((item) => item.classList.toggle('active', item === button));
+
+      if (label === 'Command Center' || label === 'CYBERSTALK') {
+        location.href = 'dashboard.html';
+        return;
+      }
+
+      if (label === 'Reports') {
+        location.href = 'report.html';
+        return;
+      }
+
+      showToast(`${label || 'View'} selected.`);
+    });
+  });
+
+  document.querySelectorAll('button').forEach((button) => {
+    if (button.id === 'logoutBtn' || button.id === 'dashboardReportBtn' || button.id === 'generatePdfBtn' || button.id === 'exportJsonBtn' || button.id === 'launchPlatformBtn' || button.id === 'loginForm' || button.type === 'submit') {
+      return;
+    }
+
+    const text = (button.textContent || '').trim();
+    if (!text) return;
+
+    const actionMap = {
+      'Run simulation': () => location.href = 'report.html',
+      'Generate report': () => location.href = 'report.html',
+      'Generate Security Report': () => location.href = 'report.html',
+      'Add Evidence': () => showToast('Evidence panel opened.'),
+      'Investigate': () => showToast('Investigation panel opened.'),
+      'View': () => showToast('Alert details opened.'),
+      'Review': () => showToast('Review queued for analyst.'),
+      'Reset': () => showToast('Timeline reset.'),
+      'Zoom': () => showToast('Zoom level adjusted.'),
+      'Save draft': () => showToast('Draft saved.'),
+      'Demo access': () => location.href = 'index.html',
+      'Sign in': () => showToast('Signing in...')
+    };
+
+    if (!button.dataset.bound) {
+      button.addEventListener('click', () => {
+        const handler = actionMap[text];
+        if (handler) {
+          handler();
+          return;
+        }
+        showToast(`${text} selected.`);
+      });
+      button.dataset.bound = 'true';
+    }
+  });
+}
+
+bindUtilityButtons();

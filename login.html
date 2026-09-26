@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cyberstalk // Secure Access</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="login-shell">
+      <div class="login-card">
+        <div class="login-visual">
+          <span class="mini-tag">Threat intelligence access</span>
+          <h2>Cyberstalking behaviour network</h2>
+          <p>Operational awareness for behavioural risk monitoring, account correlation, and digital evidence triage across distributed online environments.</p>
+
+          <div class="security-panel">
+            <div class="security-pill"><span>Secure session</span><span>Active</span></div>
+            <div class="security-pill"><span>Policy mode</span><span>Human review</span></div>
+            <div class="security-pill"><span>Signal confidence</span><span>94%</span></div>
+          </div>
+        </div>
+
+        <div class="login-form-wrap">
+          <h3>Welcome back</h3>
+          <p>Authenticate to access the analyst workspace.</p>
+
+          <form id="loginForm">
+            <div class="form-group">
+              <label class="form-label" for="email">Email address</label>
+              <input class="text-input" id="email" type="email" placeholder="analyst@cyberstalk.ai" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="password">Password</label>
+              <input class="text-input" id="password" type="password" placeholder="Enter your password" required />
+            </div>
+
+            <div class="form-row">
+              <label class="check-wrap"><input type="checkbox" /> Remember me</label>
+              <a href="#" class="linkish">Reset access</a>
+            </div>
+
+            <div class="login-actions">
+              <button class="btn btn-primary" type="submit">Sign in</button>
+              <button class="btn btn-ghost" type="button" onclick="location.href='index.html'">Demo access</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Authentication successful.</div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

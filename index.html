@@ -1,0 +1,2789 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBERSTALK // BEHAVIOUR INTELLIGENCE SYSTEM</title>
+    <meta
+      name="description"
+      content="AI-powered behaviour analysis and cyber threat intelligence dashboard for simulated behavioural pattern detection."
+    />
+    <style>
+      :root {
+        --bg: #05080d;
+        --bg-2: #08111a;
+        --panel: rgba(10, 18, 26, 0.9);
+        --panel-strong: rgba(12, 22, 31, 0.98);
+        --panel-soft: rgba(15, 23, 31, 0.8);
+        --line: rgba(79, 114, 130, 0.35);
+        --line-strong: rgba(99, 160, 195, 0.7);
+        --blue: #5dc9ff;
+        --cyan: #6ef4ff;
+        --green: #64ffb4;
+        --amber: #ffbd59;
+        --red: #ff5e7d;
+        --purple: #9b7bff;
+        --text: #eaf9ff;
+        --muted: #86a4b2;
+        --shadow-blue: rgba(93, 201, 255, 0.38);
+        --shadow-green: rgba(100, 255, 180, 0.28);
+        --shadow-red: rgba(255, 94, 125, 0.28);
+        --radius: 18px;
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(93, 201, 255, 0.14), transparent 25%),
+          radial-gradient(circle at 80% 15%, rgba(100, 255, 180, 0.08), transparent 22%),
+          linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+        color: var(--text);
+        font-family: "Segoe UI", Inter, Arial, sans-serif;
+        line-height: 1.5;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(93, 201, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(93, 201, 255, 0.04) 1px, transparent 1px);
+        background-size: 34px 34px;
+        mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+      }
+
+      a { color: inherit; text-decoration: none; }
+      button, input, select { font: inherit; }
+      button { cursor: pointer; }
+
+      .app-shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        width: 250px;
+        min-width: 250px;
+        height: 100vh;
+        padding: 22px 18px 18px;
+        background: rgba(5, 10, 15, 0.9);
+        border-right: 1px solid var(--line);
+        box-shadow: inset -1px 0 0 rgba(148, 190, 210, 0.08);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 8px 18px;
+      }
+
+      .brand-mark {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border: 1px solid rgba(94, 201, 255, 0.7);
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(93, 201, 255, 0.12), rgba(100, 255, 180, 0.08));
+        box-shadow: 0 0 22px rgba(93, 201, 255, 0.2);
+        display: grid;
+        place-items: center;
+      }
+
+      .brand-mark::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 1px solid rgba(110, 244, 255, 0.6);
+        transform: rotate(45deg);
+      }
+
+      .brand-mark span {
+        position: relative;
+        font-weight: 800;
+        font-size: 13px;
+        color: var(--cyan);
+        letter-spacing: 0.12em;
+      }
+
+      .brand-text {
+        display: block;
+        font-size: 0.8rem;
+        letter-spacing: 0.15em;
+      }
+
+      .brand-name {
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .brand-sub {
+        margin-top: 2px;
+        color: var(--muted);
+        font-size: 0.56rem;
+        letter-spacing: 0.17em;
+      }
+
+      .nav-stack {
+        margin-top: 18px;
+      }
+
+      .nav-label {
+        margin: 12px 8px 10px;
+        color: rgba(134, 164, 178, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font-size: 0.6rem;
+      }
+
+      .nav-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .nav-btn {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 11px 12px;
+        color: #c7dbe4;
+        text-align: left;
+        transition: 0.25s ease;
+      }
+
+      .nav-btn:hover,
+      .nav-btn.active {
+        border-color: rgba(93, 201, 255, 0.3);
+        background: linear-gradient(90deg, rgba(93, 201, 255, 0.1), rgba(93, 201, 255, 0.03));
+        box-shadow: inset 0 0 0 1px rgba(93, 201, 255, 0.06), 0 0 22px rgba(93, 201, 255, 0.08);
+      }
+
+      .nav-btn small {
+        margin-left: auto;
+        padding: 3px 6px;
+        border-radius: 999px;
+        background: rgba(255, 94, 125, 0.12);
+        border: 1px solid rgba(255, 94, 125, 0.25);
+        color: var(--red);
+        font-size: 0.55rem;
+        letter-spacing: 0.08em;
+      }
+
+      .nav-icon {
+        width: 18px;
+        height: 18px;
+        opacity: 0.9;
+      }
+
+      .sidebar-footer {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+      }
+
+      .info-card {
+        border: 1px solid rgba(100, 255, 180, 0.28);
+        border-radius: 14px;
+        background: rgba(9, 24, 22, 0.55);
+        padding: 14px 12px 12px;
+        box-shadow: inset 0 0 0 1px rgba(100, 255, 180, 0.06), 0 0 20px rgba(100, 255, 180, 0.06);
+      }
+
+      .info-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--green);
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .info-card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 0.67rem;
+        line-height: 1.6;
+      }
+
+      .build-tag {
+        margin-top: 12px;
+        color: rgba(134, 164, 178, 0.75);
+        font-size: 0.56rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .main {
+        flex: 1;
+        padding: 0 22px 30px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 74px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .crumb {
+        color: var(--muted);
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .crumb strong {
+        color: var(--cyan);
+        font-weight: 600;
+      }
+
+      .status-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .status-pill {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(100, 255, 180, 0.2);
+        background: rgba(12, 23, 18, 0.65);
+        color: var(--green);
+        font-size: 0.62rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 16px rgba(100, 255, 180, 0.9);
+        animation: pulse 1.8s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.7; }
+      }
+
+      .mini-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: rgba(15, 24, 34, 0.65);
+        box-shadow: inset 0 0 0 1px rgba(93, 201, 255, 0.04);
+        display: grid;
+        place-items: center;
+        transition: 0.2s ease;
+      }
+
+      .mini-button:hover {
+        border-color: rgba(93, 201, 255, 0.4);
+        box-shadow: 0 0 20px rgba(93, 201, 255, 0.1);
+      }
+
+      .user-badge {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(93, 201, 255, 0.4);
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, rgba(93, 201, 255, 0.12), rgba(100, 255, 180, 0.08));
+        color: var(--cyan);
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      .hero {
+        padding-top: 26px;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 20px;
+      }
+
+      .hero-copy {
+        min-width: 0;
+      }
+
+      .eyebrow {
+        color: var(--green);
+        letter-spacing: 0.18em;
+        font-size: 0.62rem;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 12px 0 8px;
+        font-size: clamp(2.2rem, 4vw, 4.7rem);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        font-weight: 800;
+        max-width: 700px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 0.9rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+      }
+
+      .primary-btn,
+      .secondary-btn,
+      .small-btn,
+      .action-btn {
+        border-radius: 12px;
+        transition: 0.2s ease;
+      }
+
+      .primary-btn {
+        border: 1px solid rgba(93, 201, 255, 0.4);
+        background: linear-gradient(135deg, rgba(93, 201, 255, 0.24), rgba(110, 244, 255, 0.12));
+        color: #dff9ff;
+        padding: 12px 16px;
+        font-weight: 700;
+        box-shadow: 0 0 28px rgba(93, 201, 255, 0.14);
+      }
+
+      .secondary-btn {
+        border: 1px solid rgba(120, 131, 141, 0.45);
+        background: rgba(15, 24, 32, 0.7);
+        color: var(--text);
+        padding: 12px 16px;
+      }
+
+      .primary-btn:hover,
+      .secondary-btn:hover,
+      .small-btn:hover,
+      .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 24px rgba(93, 201, 255, 0.14);
+      }
+
+      .hero-network-wrap {
+        position: relative;
+        min-height: 360px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: linear-gradient(180deg, rgba(9, 17, 24, 0.92), rgba(8, 16, 22, 0.78));
+        overflow: hidden;
+        box-shadow: inset 0 0 0 1px rgba(120, 180, 215, 0.04), 0 0 30px rgba(4, 12, 18, 0.7);
+      }
+
+      .hero-network-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(93, 201, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(93, 201, 255, 0.04) 1px, transparent 1px);
+        background-size: 22px 22px;
+      }
+
+      .network-svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+      }
+
+      .network-badge {
+        position: absolute;
+        left: 20px;
+        bottom: 20px;
+        z-index: 2;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(7, 13, 18, 0.72);
+        border: 1px solid rgba(120, 171, 199, 0.3);
+        box-shadow: 0 0 22px rgba(93, 201, 255, 0.08);
+      }
+
+      .network-badge strong {
+        display: block;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--cyan);
+      }
+
+      .network-badge span {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.58rem;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .stats-grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .signal-board {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      .signal-panel {
+        overflow: hidden;
+      }
+
+      .signal-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        padding: 16px 18px 18px;
+      }
+
+      .signal-card {
+        position: relative;
+        border: 1px solid rgba(119, 146, 164, 0.22);
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(12, 18, 24, 0.9), rgba(10, 18, 24, 0.7));
+        padding: 14px 12px 12px;
+        overflow: hidden;
+      }
+
+      .signal-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--blue), transparent, var(--green));
+      }
+
+      .signal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .signal-head strong {
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .signal-score {
+        color: var(--cyan);
+        font-size: 1.2rem;
+        font-weight: 800;
+      }
+
+      .signal-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+        line-height: 1.6;
+      }
+
+      .signal-meter {
+        margin-top: 12px;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(146, 170, 182, 0.14);
+        overflow: hidden;
+      }
+
+      .signal-meter span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--cyan), var(--green));
+      }
+
+      .brief-box {
+        padding: 18px 18px 10px;
+      }
+
+      .brief-box .brief-label {
+        display: inline-block;
+        margin-bottom: 12px;
+        color: var(--muted);
+        font-size: 0.58rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .brief-box h3 {
+        margin: 0 0 10px;
+        font-size: 1.2rem;
+      }
+
+      .brief-box p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 0.72rem;
+      }
+
+      .brief-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .brief-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        color: #dfeef5;
+        font-size: 0.72rem;
+        padding: 10px 12px;
+        border: 1px solid rgba(120, 145, 165, 0.2);
+        border-radius: 10px;
+        background: rgba(11, 18, 24, 0.8);
+      }
+
+      .brief-list li span:last-child {
+        color: var(--green);
+        letter-spacing: 0.14em;
+        font-size: 0.56rem;
+        text-transform: uppercase;
+      }
+
+      .stat-card {
+        padding: 16px 14px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(13, 22, 30, 0.9), rgba(8, 17, 23, 0.8));
+        border: 1px solid var(--line);
+        min-height: 116px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-card::after {
+        content: "";
+        position: absolute;
+        right: -18px;
+        bottom: -30px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 1px solid rgba(124, 162, 190, 0.2);
+        box-shadow: 0 0 0 18px rgba(11, 19, 27, 0.8), 0 0 0 20px rgba(48, 72, 82, 0.16);
+        opacity: 0.9;
+      }
+
+      .stat-label {
+        position: relative;
+        color: var(--muted);
+        font-size: 0.6rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .stat-value {
+        position: relative;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .stat-value strong {
+        font-size: clamp(1.5rem, 2vw, 2.2rem);
+        font-weight: 800;
+      }
+
+      .stat-note {
+        position: relative;
+        color: var(--muted);
+        font-size: 0.58rem;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .stat-card.red strong { color: var(--red); }
+      .stat-card.blue strong { color: var(--blue); }
+      .stat-card.green strong { color: var(--green); }
+      .stat-card.amber strong { color: var(--amber); }
+      .stat-card.purple strong { color: var(--purple); }
+
+      .main-grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.78fr);
+        gap: 16px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(9, 19, 25, 0.9);
+        box-shadow: inset 0 0 0 1px rgba(120, 180, 215, 0.04);
+        overflow: hidden;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 60px;
+        padding: 0 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(12, 19, 25, 0.66);
+      }
+
+      .panel-title-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .panel-label {
+        color: var(--muted);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 0.58rem;
+      }
+
+      .panel-title {
+        font-size: 1.1rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+
+      .panel-tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .tiny-select,
+      .small-btn,
+      .action-btn {
+        border: 1px solid rgba(119, 146, 164, 0.36);
+        background: rgba(14, 22, 30, 0.7);
+        color: var(--text);
+      }
+
+      .tiny-select {
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .chart-wrap {
+        height: 286px;
+        padding: 14px 18px 12px;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .legend {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 0 18px 14px;
+        color: var(--muted);
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .legend-swatch {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--blue);
+        box-shadow: 0 0 18px rgba(93, 201, 255, 0.5);
+      }
+
+      .legend-swatch.alt {
+        background: var(--red);
+        box-shadow: 0 0 18px rgba(255, 94, 125, 0.5);
+      }
+
+      .risk-panel {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .risk-panel::before {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        right: -50px;
+        top: 26px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 94, 125, 0.38);
+        box-shadow: 0 0 0 14px rgba(255, 94, 125, 0.05), 0 0 28px rgba(255, 94, 125, 0.1);
+      }
+
+      .risk-wrap {
+        padding: 20px 18px 18px;
+      }
+
+      .risk-score-shell {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .ring {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(var(--red) 0 87%, rgba(255, 255, 255, 0.06) 87% 100%);
+        box-shadow: 0 0 35px rgba(255, 94, 125, 0.18);
+        display: grid;
+        place-items: center;
+      }
+
+      .ring::before {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border-radius: 50%;
+        background: rgba(10, 17, 24, 1);
+        border: 1px solid rgba(255, 94, 125, 0.2);
+      }
+
+      .ring-value {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
+      }
+
+      .ring-value strong {
+        font-size: 2rem;
+        color: var(--red);
+      }
+
+      .ring-value small {
+        margin-top: 4px;
+        color: var(--muted);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-size: 0.56rem;
+      }
+
+      .risk-text {
+        min-width: 0;
+      }
+
+      .risk-level {
+        color: var(--red);
+        font-size: 1.1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .risk-caption {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.6;
+      }
+
+      .risk-bar {
+        margin-top: 18px;
+        height: 8px;
+        width: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--green) 0%, var(--amber) 36%, var(--red) 72%);
+        overflow: hidden;
+      }
+
+      .risk-bar span {
+        display: block;
+        height: 100%;
+        width: 87%;
+        background: rgba(12, 22, 30, 0.4);
+        border-right: 2px solid rgba(255, 255, 255, 0.7);
+      }
+
+      .risk-scale {
+        margin-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .factor-list {
+        margin-top: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .factor {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px 10px;
+      }
+
+      .factor-name {
+        color: #d2e5eb;
+        font-size: 0.72rem;
+      }
+
+      .factor-value {
+        color: var(--red);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .factor-track {
+        grid-column: 1 / -1;
+        height: 6px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(120, 136, 147, 0.18);
+      }
+
+      .factor-track span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
+      }
+
+      .lower-grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr);
+        gap: 16px;
+      }
+
+      .analysis-list {
+        display: grid;
+        gap: 12px;
+        padding: 16px 18px 18px;
+      }
+
+      .analysis-row {
+        display: grid;
+        grid-template-columns: 1.2fr 100px 90px 120px;
+        gap: 14px;
+        align-items: center;
+        border: 1px solid rgba(120, 146, 165, 0.2);
+        border-radius: 12px;
+        background: rgba(11, 18, 23, 0.8);
+        padding: 12px 14px;
+      }
+
+      .module-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .check {
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        background: rgba(100, 255, 180, 0.1);
+        border: 1px solid rgba(100, 255, 180, 0.38);
+        color: var(--green);
+        font-weight: 700;
+      }
+
+      .analysis-row h4 {
+        margin: 0;
+        font-size: 0.78rem;
+        letter-spacing: 0.02em;
+      }
+
+      .meta-label {
+        color: var(--muted);
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .meta-value {
+        font-size: 0.76rem;
+        color: #dfeef5;
+      }
+
+      .confidence-bar {
+        position: relative;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(129, 147, 157, 0.14);
+        overflow: hidden;
+      }
+
+      .confidence-bar span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--green), var(--blue));
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(100, 255, 180, 0.3);
+        color: var(--green);
+        background: rgba(100, 255, 180, 0.08);
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .alerts-panel,
+      .evidence-panel,
+      .sim-panel,
+      .report-panel,
+      .case-panel,
+      .cluster-panel,
+      .relationship-panel {
+        overflow: hidden;
+      }
+
+      .alert-list {
+        padding: 10px 12px 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .alert-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+        align-items: start;
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(12, 18, 24, 0.8);
+        border: 1px solid rgba(120, 145, 165, 0.2);
+      }
+
+      .alert-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 62px;
+        padding: 5px 8px;
+        border-radius: 999px;
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+
+      .alert-pill.high { background: rgba(255, 94, 125, 0.08); color: var(--red); border: 1px solid rgba(255, 94, 125, 0.28); }
+      .alert-pill.medium { background: rgba(255, 189, 89, 0.08); color: var(--amber); border: 1px solid rgba(255, 189, 89, 0.28); }
+      .alert-pill.low { background: rgba(100, 255, 180, 0.08); color: var(--green); border: 1px solid rgba(100, 255, 180, 0.28); }
+
+      .alert-body strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.78rem;
+      }
+
+      .alert-meta {
+        color: var(--muted);
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .alert-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .small-btn,
+      .action-btn {
+        border-radius: 10px;
+        padding: 7px 10px;
+        font-size: 0.56rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .small-btn.primary,
+      .action-btn.primary {
+        background: rgba(93, 201, 255, 0.12);
+        border-color: rgba(93, 201, 255, 0.34);
+        color: var(--cyan);
+      }
+
+      .timeline-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 18px 18px 16px;
+      }
+
+      .timeline-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .timeline-row::before {
+        content: "";
+        position: absolute;
+        left: 88px;
+        top: 4px;
+        bottom: -12px;
+        width: 1px;
+        background: linear-gradient(180deg, rgba(93, 201, 255, 0.35), rgba(93, 201, 255, 0.04));
+      }
+
+      .timeline-row:last-child::before { bottom: 18px; }
+
+      .time-tag {
+        position: relative;
+        z-index: 1;
+        padding-top: 8px;
+        color: var(--muted);
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+      }
+
+      .event-node {
+        position: relative;
+        z-index: 1;
+        margin-left: 12px;
+        padding: 12px 14px 12px 16px;
+        border: 1px solid rgba(93, 201, 255, 0.22);
+        border-left: 3px solid var(--blue);
+        border-radius: 12px;
+        background: rgba(12, 19, 25, 0.82);
+        box-shadow: inset 0 0 0 1px rgba(93, 201, 255, 0.04);
+      }
+
+      .event-node strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
+      }
+
+      .event-node span {
+        color: var(--muted);
+        font-size: 0.66rem;
+      }
+
+      .event-node.active {
+        border-color: rgba(100, 255, 180, 0.42);
+        border-left-color: var(--green);
+        box-shadow: 0 0 22px rgba(100, 255, 180, 0.08);
+      }
+
+      .detail-card {
+        padding: 16px 18px 18px;
+      }
+
+      .detail-card h3 {
+        margin: 0 0 10px;
+        font-size: 0.9rem;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 14px;
+      }
+
+      .detail-item {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(13, 20, 26, 0.8);
+        border: 1px solid rgba(120, 145, 165, 0.2);
+      }
+
+      .detail-item label {
+        display: block;
+        color: var(--muted);
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .detail-item strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.76rem;
+      }
+
+      .relationship-canvas {
+        position: relative;
+        background: rgba(10, 17, 23, 0.82);
+      }
+
+      .node-map {
+        width: 100%;
+        height: 290px;
+      }
+
+      .cluster-grid {
+        display: grid;
+        gap: 12px;
+        padding: 16px 18px 18px;
+      }
+
+      .cluster-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(14, 21, 28, 0.8);
+        border: 1px solid rgba(120, 145, 165, 0.2);
+      }
+
+      .cluster-tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 92px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(93, 201, 255, 0.08);
+        color: var(--cyan);
+        border: 1px solid rgba(93, 201, 255, 0.25);
+        font-size: 0.56rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .metric-inline {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .metric-inline strong {
+        font-size: 0.82rem;
+      }
+
+      .metric-inline span {
+        color: var(--muted);
+        font-size: 0.55rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .rightside {
+        display: grid;
+        gap: 16px;
+      }
+
+      .sim-grid {
+        display: grid;
+        gap: 12px;
+        padding: 16px 18px 18px;
+      }
+
+      .control {
+        display: grid;
+        gap: 8px;
+      }
+
+      .control label {
+        display: flex;
+        justify-content: space-between;
+        color: #e4eef3;
+        font-size: 0.7rem;
+      }
+
+      .control label span:last-child {
+        color: var(--cyan);
+      }
+
+      .control input[type="range"] {
+        width: 100%;
+        accent-color: var(--blue);
+      }
+
+      .whatif-grid,
+      .evidence-grid,
+      .case-grid,
+      .report-grid {
+        display: grid;
+        gap: 12px;
+        padding: 16px 18px 18px;
+      }
+
+      .whatif-box,
+      .evidence-card,
+      .case-box,
+      .report-box {
+        border: 1px solid rgba(120, 145, 165, 0.25);
+        border-radius: 12px;
+        background: rgba(12, 19, 25, 0.78);
+        padding: 12px 14px;
+      }
+
+      .whatif-box strong,
+      .evidence-card strong,
+      .case-box strong,
+      .report-box strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.76rem;
+      }
+
+      .whatif-box p,
+      .evidence-card p,
+      .case-box p,
+      .report-box p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.6;
+      }
+
+      .evidence-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .evidence-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 1px solid rgba(120, 145, 165, 0.2);
+        border-radius: 12px;
+        background: rgba(12, 20, 26, 0.8);
+      }
+
+      .evidence-item strong {
+        font-size: 0.74rem;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 8px;
+        border-radius: 999px;
+        font-size: 0.56rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        border: 1px solid rgba(120, 145, 165, 0.2);
+        color: var(--muted);
+      }
+
+      .tag.green { color: var(--green); border-color: rgba(100, 255, 180, 0.25); background: rgba(100, 255, 180, 0.05); }
+      .tag.orange { color: var(--amber); border-color: rgba(255, 189, 89, 0.25); background: rgba(255, 189, 89, 0.05); }
+      .tag.red { color: var(--red); border-color: rgba(255, 94, 125, 0.25); background: rgba(255, 94, 125, 0.05); }
+
+      .report-box ul {
+        margin: 8px 0 0 18px;
+        padding: 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+        line-height: 1.8;
+      }
+
+      .report-actions,
+      .case-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .case-box table {
+        width: 100%;
+        border-spacing: 0 8px;
+        font-size: 0.68rem;
+        color: var(--muted);
+      }
+
+      .case-box td {
+        padding: 6px 0;
+      }
+
+      .case-box td:first-child {
+        color: #dfeef4;
+        width: 42%;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(10, 18, 24, 0.72);
+      }
+
+      .search-box {
+        position: relative;
+        flex: 1;
+      }
+
+      .search-box svg {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        color: var(--muted);
+      }
+
+      .search-box input {
+        width: 100%;
+        height: 42px;
+        padding: 0 14px 0 38px;
+        background: rgba(13, 22, 26, 0.84);
+        border: 1px solid rgba(120, 145, 165, 0.24);
+        border-radius: 12px;
+        color: var(--text);
+        outline: none;
+      }
+
+      .search-box input:focus,
+      .tiny-select:focus,
+      .text-input:focus {
+        border-color: rgba(93, 201, 255, 0.6);
+        box-shadow: 0 0 0 3px rgba(93, 201, 255, 0.12);
+      }
+
+      .filter-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .filter-tag {
+        border: 1px solid rgba(120, 145, 165, 0.2);
+        background: rgba(13, 22, 26, 0.8);
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .filter-tag.active {
+        background: rgba(93, 201, 255, 0.12);
+        border-color: rgba(93, 201, 255, 0.3);
+        color: var(--cyan);
+      }
+
+      .main-panel-wrap {
+        margin-top: 18px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+
+      .section-header h2 {
+        margin: 0;
+        font-size: 0.85rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .section-header .right {
+        display: flex;
+        gap: 8px;
+      }
+
+      .floating-toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        max-width: 340px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(93, 201, 255, 0.3);
+        background: rgba(12, 18, 24, 0.94);
+        box-shadow: 0 0 28px rgba(93, 201, 255, 0.12);
+        color: var(--text);
+        opacity: 0;
+        transform: translateY(12px);
+        pointer-events: none;
+        transition: 0.25s ease;
+        z-index: 30;
+      }
+
+      .floating-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        place-items: center;
+        background: rgba(2, 7, 12, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 40;
+      }
+
+      .modal.show { display: grid; }
+
+      .modal-card {
+        width: min(900px, calc(100vw - 26px));
+        border: 1px solid rgba(120, 145, 165, 0.28);
+        border-radius: 18px;
+        background: rgba(10, 17, 24, 0.97);
+        box-shadow: 0 30px 70px rgba(2, 6, 11, 0.8);
+        overflow: hidden;
+      }
+
+      .modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .modal-head h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .close-btn {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(120, 145, 165, 0.3);
+        border-radius: 10px;
+        background: rgba(13, 20, 25, 0.7);
+        color: var(--text);
+      }
+
+      .modal-body {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+        padding: 18px 20px 20px;
+      }
+
+      .case-form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .field.full { grid-column: 1 / -1; }
+
+      .field label {
+        color: var(--muted);
+        font-size: 0.58rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .text-input {
+        width: 100%;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(12, 19, 24, 0.8);
+        border: 1px solid rgba(120, 145, 165, 0.22);
+        color: var(--text);
+        padding: 0 12px;
+      }
+
+      .field textarea {
+        min-height: 110px;
+        resize: vertical;
+        padding: 12px;
+        border-radius: 12px;
+        background: rgba(12, 19, 24, 0.8);
+        border: 1px solid rgba(120, 145, 165, 0.22);
+        color: var(--text);
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .side-panel {
+        display: grid;
+        gap: 12px;
+      }
+
+      .mini-box {
+        border: 1px solid rgba(120, 145, 165, 0.22);
+        border-radius: 12px;
+        background: rgba(12, 19, 24, 0.8);
+        padding: 12px;
+      }
+
+      .mini-box h4 {
+        margin: 0 0 12px;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .mini-box ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 0.7rem;
+        line-height: 1.8;
+      }
+
+      .status-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+
+      .status-line strong {
+        color: var(--text);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        border: 0;
+      }
+
+      @media (max-width: 1200px) {
+        .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .hero { grid-template-columns: 1fr; }
+        .lower-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 960px) {
+        .app-shell { display: block; }
+        .sidebar {
+          width: 100%;
+          min-width: 0;
+          height: auto;
+          position: relative;
+          border-right: none;
+          border-bottom: 1px solid var(--line);
+        }
+        .sidebar-footer { position: static; margin-top: 18px; }
+        .nav-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .main { padding: 0 14px 30px; }
+        .main-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 640px) {
+        .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .nav-list { grid-template-columns: 1fr; }
+        .analysis-row {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+        .case-form,
+        .modal-body { grid-template-columns: 1fr; }
+        .topbar { min-height: 66px; }
+        .status-group { gap: 8px; }
+        .status-pill { letter-spacing: 0.08em; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"><span>CS</span></div>
+          <div class="brand-text">
+            <div class="brand-name">CYBERSTALK</div>
+            <div class="brand-sub">AI DEFENSE</div>
+          </div>
+        </div>
+
+        <div class="nav-stack">
+          <div class="nav-label">Command</div>
+          <nav class="nav-list" aria-label="Primary navigation">
+            <button class="nav-btn active" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h6V5H3v7Zm12 0h6V5h-6v7ZM3 19h6v-7H3v7Zm12 0h6v-7h-6v7Z"/><path d="M12 3v18"/></svg>Command Center</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 17V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10"/><path d="M9 11h6M9 15h6M7 21h10"/></svg>Behaviour Analysis</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 18V8m0 10h16M4 8l5-4 5 4 6-4v12l-6 4-5-4-5 4Z"/></svg>Threat Graph</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h5l2-5 4 10 2-5h3"/></svg>Timeline</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 4h8M6 7h12M4 10h16v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8Z"/></svg>Risk Intelligence</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 7.5A2.5 2.5 0 0 1 7.5 5h9A2.5 2.5 0 0 1 19 7.5v9A2.5 2.5 0 0 1 16.5 19h-9A2.5 2.5 0 0 1 5 16.5v-9Z"/><path d="M9 9h6v6H9z"/></svg>Evidence</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v10m0 0 4-4m-4 4-4-4m4 4v4"/><path d="M5 18h14"/></svg>Alerts <small>3</small></button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 17.5V7.5A1.5 1.5 0 0 1 7.5 6h9A1.5 1.5 0 0 1 18 7.5v10"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>Reports</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 7h10v10H7z"/><path d="M10 12h4M12 10v4"/></svg>Simulation</button>
+            <button class="nav-btn" type="button"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v4m0 10v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M3 12h4m10 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/></svg>Settings</button>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="info-card">
+            <div class="info-head">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg>
+              Privacy-first mode
+            </div>
+            <p>Behavioural analysis is probabilistic and should support, not replace, human investigation.</p>
+          </div>
+          <div class="build-tag">Local Demo Instance • v0.9.4</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div class="crumb">Workspace / <strong>Command Center</strong></div>
+          <div class="status-group">
+            <div class="status-pill"><span class="pulse" aria-hidden="true"></span>System online</div>
+            <div class="mini-button" aria-label="Refresh dashboard">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 17 7.7L20 12M18.4 15A7 7 0 0 1 7 16.3L4 12"/></svg>
+            </div>
+            <div class="user-badge" aria-label="Analyst profile">AI</div>
+          </div>
+        </header>
+
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">Threat Intelligence Platform</div>
+            <h1>Cyberstalking<br />Behaviour Detector</h1>
+            <div class="subtitle">Detect • Analyze • Correlate • Respond</div>
+
+            <div class="hero-actions">
+              <button class="primary-btn" type="button" id="simulateBtn">Run Simulation</button>
+              <button class="secondary-btn" type="button" id="investigateBtn">Investigate</button>
+              <button class="secondary-btn" type="button" id="launchPlatformBtn">Secure Access</button>
+            </div>
+          </div>
+
+          <div class="hero-network-wrap" aria-label="Animated behaviour network map">
+            <svg class="network-svg" id="networkSvg" viewBox="0 0 560 380" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <filter id="glowBlue">
+                  <feGaussianBlur stdDeviation="2.7" result="blur"/>
+                  <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+            </svg>
+            <div class="network-badge">
+              <strong>Network watch</strong>
+              <span>Live correlation chain</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid" aria-label="Dashboard statistics">
+          <article class="stat-card red">
+            <div class="stat-label">Total events</div>
+            <div class="stat-value"><strong id="totalEvents">1284</strong><span class="stat-note">demo</span></div>
+          </article>
+          <article class="stat-card blue">
+            <div class="stat-label">Suspicious events</div>
+            <div class="stat-value"><strong id="suspiciousEvents">217</strong><span class="stat-note">+12%</span></div>
+          </article>
+          <article class="stat-card red">
+            <div class="stat-label">High-risk events</div>
+            <div class="stat-value"><strong id="highRiskEvents">43</strong><span class="stat-note">urgent</span></div>
+          </article>
+          <article class="stat-card purple">
+            <div class="stat-label">Behaviour clusters</div>
+            <div class="stat-value"><strong id="clusterCount">12</strong><span class="stat-note">active</span></div>
+          </article>
+          <article class="stat-card green">
+            <div class="stat-label">Active cases</div>
+            <div class="stat-value"><strong id="activeCases">07</strong><span class="stat-note">open</span></div>
+          </article>
+          <article class="stat-card blue">
+            <div class="stat-label">System confidence</div>
+            <div class="stat-value"><strong id="confidenceLevel">94%</strong><span class="stat-note">AI</span></div>
+          </article>
+        </section>
+
+        <section class="signal-board">
+          <article class="panel signal-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">AI signal map</div>
+                <h2 class="panel-title">Signal layers</h2>
+              </div>
+            </div>
+            <div class="signal-grid">
+              <div class="signal-card">
+                <div class="signal-head"><strong>Cross-platform</strong><span class="signal-score">82%</span></div>
+                <p>Repeated exposure patterns across messaging, account, and device contexts.</p>
+                <div class="signal-meter"><span style="width:82%"></span></div>
+              </div>
+              <div class="signal-card">
+                <div class="signal-head"><strong>Pressure pattern</strong><span class="signal-score">74%</span></div>
+                <p>Behavioural pressure appears to increase after block events and failed disengagement.</p>
+                <div class="signal-meter"><span style="width:74%"></span></div>
+              </div>
+              <div class="signal-card">
+                <div class="signal-head"><strong>Re-identification</strong><span class="signal-score">68%</span></div>
+                <p>Related identifiers show moderate linkage through account overlap and contact timing.</p>
+                <div class="signal-meter"><span style="width:68%"></span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel signal-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Threat brief</div>
+                <h2 class="panel-title">Live insight</h2>
+              </div>
+            </div>
+            <div class="brief-box">
+              <div class="brief-label">System interpretation</div>
+              <h3>Escalation is sustained</h3>
+              <p>Signal overlap indicates persistent contact attempts, repeated re-engagement, and a concentrated post-block escalation pattern.</p>
+              <ul class="brief-list">
+                <li><span>Contact persistence</span><span>High</span></li>
+                <li><span>Risk acceleration</span><span>Active</span></li>
+                <li><span>Cross-account correlation</span><span>Moderate</span></li>
+              </ul>
+            </div>
+          </article>
+        </section>
+
+        <section class="main-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Threat graph</div>
+                <h2 class="panel-title">Live activity</h2>
+              </div>
+              <div class="panel-tools">
+                <button class="small-btn primary" type="button">Zoom</button>
+                <button class="small-btn" type="button">Reset</button>
+                <select class="tiny-select" aria-label="Graph time range">
+                  <option>24H</option>
+                  <option selected>7D</option>
+                  <option>30D</option>
+                  <option>Custom</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="activityChart" aria-label="Behaviour event graph"></canvas>
+            </div>
+            <div class="legend">
+              <span class="legend-item"><span class="legend-swatch"></span>Contact attempts</span>
+              <span class="legend-item"><span class="legend-swatch alt"></span>Block events</span>
+            </div>
+          </article>
+
+          <aside class="panel risk-panel" aria-label="Threat risk assessment">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Risk intelligence</div>
+                <h2 class="panel-title">Threat risk</h2>
+              </div>
+            </div>
+            <div class="risk-wrap">
+              <div class="risk-score-shell">
+                <div class="ring" aria-label="Risk score 87 percent">
+                  <div class="ring-value"><strong id="threatRisk">87</strong><small>%</small></div>
+                </div>
+                <div class="risk-text">
+                  <div class="risk-level">High Risk</div>
+                  <div class="risk-caption">Simulated behavioural indicators suggest repeated contact attempts and elevated block-evasion patterns.</div>
+                </div>
+              </div>
+
+              <div class="risk-bar"><span id="riskBarFill"></span></div>
+              <div class="risk-scale"><span>Low</span><span>Moderate</span><span>Elevated</span></div>
+
+              <div class="factor-list">
+                <div class="factor">
+                  <span class="factor-name">Message Frequency</span>
+                  <span class="factor-value">82%</span>
+                  <div class="factor-track"><span style="width:82%"></span></div>
+                </div>
+                <div class="factor">
+                  <span class="factor-name">Repeated Contact</span>
+                  <span class="factor-value">76%</span>
+                  <div class="factor-track"><span style="width:76%"></span></div>
+                </div>
+                <div class="factor">
+                  <span class="factor-name">Account Switching</span>
+                  <span class="factor-value">64%</span>
+                  <div class="factor-track"><span style="width:64%"></span></div>
+                </div>
+                <div class="factor">
+                  <span class="factor-name">Block Evasion</span>
+                  <span class="factor-value">91%</span>
+                  <div class="factor-track"><span style="width:91%"></span></div>
+                </div>
+                <div class="factor">
+                  <span class="factor-name">Escalation Pattern</span>
+                  <span class="factor-value">79%</span>
+                  <div class="factor-track"><span style="width:79%"></span></div>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="lower-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">AI Behaviour Engine</div>
+                <h2 class="panel-title">Detection modules</h2>
+              </div>
+            </div>
+            <div class="analysis-list">
+              <div class="analysis-row">
+                <div class="module-name"><span class="check">✓</span><h4>Contact Frequency Analysis</h4></div>
+                <div><div class="meta-label">Status</div><div class="meta-value">Active</div></div>
+                <div><div class="meta-label">Confidence</div><div class="meta-value">92%</div></div>
+                <div><div class="meta-label">Events</div><div class="meta-value">184</div></div>
+                <div><div class="meta-label">Last</div><div class="meta-value">03m ago</div></div>
+              </div>
+              <div class="analysis-row">
+                <div class="module-name"><span class="check">✓</span><h4>Persistence Detection</h4></div>
+                <div><div class="meta-label">Status</div><div class="meta-value">Active</div></div>
+                <div><div class="meta-label">Confidence</div><div class="meta-value">88%</div></div>
+                <div><div class="meta-label">Events</div><div class="meta-value">76</div></div>
+                <div><div class="meta-label">Last</div><div class="meta-value">09m ago</div></div>
+              </div>
+              <div class="analysis-row">
+                <div class="module-name"><span class="check">✓</span><h4>Account Switching Detection</h4></div>
+                <div><div class="meta-label">Status</div><div class="meta-value">Monitored</div></div>
+                <div><div class="meta-label">Confidence</div><div class="meta-value">84%</div></div>
+                <div><div class="meta-label">Events</div><div class="meta-value">63</div></div>
+                <div><div class="meta-label">Last</div><div class="meta-value">12m ago</div></div>
+              </div>
+              <div class="analysis-row">
+                <div class="module-name"><span class="check">✓</span><h4>Block-Evasion Detection</h4></div>
+                <div><div class="meta-label">Status</div><div class="meta-value">Critical</div></div>
+                <div><div class="meta-label">Confidence</div><div class="meta-value">91%</div></div>
+                <div><div class="meta-label">Events</div><div class="meta-value">41</div></div>
+                <div><div class="meta-label">Last</div><div class="meta-value">02m ago</div></div>
+              </div>
+              <div class="analysis-row">
+                <div class="module-name"><span class="check">✓</span><h4>Temporal Pattern Analysis</h4></div>
+                <div><div class="meta-label">Status</div><div class="meta-value">Active</div></div>
+                <div><div class="meta-label">Confidence</div><div class="meta-value">86%</div></div>
+                <div><div class="meta-label">Events</div><div class="meta-value">99</div></div>
+                <div><div class="meta-label">Last</div><div class="meta-value">05m ago</div></div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="panel alerts-panel" aria-label="Alert center">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Alert center</div>
+                <h2 class="panel-title">Live alerts</h2>
+              </div>
+              <div class="panel-tools">
+                <button class="action-btn primary" type="button">View</button>
+              </div>
+            </div>
+            <div class="alert-list">
+              <div class="alert-item">
+                <span class="alert-pill high">High</span>
+                <div class="alert-body">
+                  <strong>Repeated contact detected</strong>
+                  <div class="alert-meta">02:14:13 • Event ID 4018 • Confidence 94%</div>
+                </div>
+                <div class="alert-actions">
+                  <button class="small-btn" type="button">View</button>
+                </div>
+              </div>
+              <div class="alert-item">
+                <span class="alert-pill high">High</span>
+                <div class="alert-body">
+                  <strong>Multiple accounts correlated</strong>
+                  <div class="alert-meta">01:44:09 • Event ID 3981 • Confidence 90%</div>
+                </div>
+                <div class="alert-actions">
+                  <button class="small-btn" type="button">Investigate</button>
+                </div>
+              </div>
+              <div class="alert-item">
+                <span class="alert-pill medium">Medium</span>
+                <div class="alert-body">
+                  <strong>Contact attempts increased</strong>
+                  <div class="alert-meta">00:58:13 • Event ID 3910 • Confidence 82%</div>
+                </div>
+                <div class="alert-actions">
+                  <button class="small-btn" type="button">Review</button>
+                </div>
+              </div>
+              <div class="alert-item">
+                <span class="alert-pill medium">Medium</span>
+                <div class="alert-body">
+                  <strong>Repeated interaction post-block</strong>
+                  <div class="alert-meta">00:17:04 • Event ID 3879 • Confidence 79%</div>
+                </div>
+                <div class="alert-actions">
+                  <button class="small-btn" type="button">Export</button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </section>
+
+        <div class="main-panel-wrap">
+          <div class="section-header">
+            <h2>Investigation workspace</h2>
+            <div class="right">
+              <button class="small-btn primary" type="button" id="generateReportBtn">Generate Security Report</button>
+              <button class="small-btn" type="button" id="addEvidenceBtn">Add Evidence</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="main-grid">
+          <article class="panel timeline-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Event timeline</div>
+                <h2 class="panel-title">Investigation trail</h2>
+              </div>
+            </div>
+            <div class="timeline-wrap" id="timelineWrap">
+              <div class="timeline-row">
+                <div class="time-tag">10:42 PM</div>
+                <div class="event-node active" data-title="Message attempt" data-time="10:42 PM" data-risk="High" data-source="Messaging" data-detail="Repeated contact message sent after recent block. Similar behaviour observed across multiple previous sessions.">
+                  <strong>Message attempt</strong>
+                  <span>High risk • Messaging channel</span>
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="time-tag">10:44 PM</div>
+                <div class="event-node" data-title="Follow-up message" data-time="10:44 PM" data-risk="High" data-source="Account relay" data-detail="Multiple messages sent within a short window, indicating high frequency and persistence.">
+                  <strong>Follow-up message</strong>
+                  <span>High risk • Contact frequency</span>
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="time-tag">10:47 PM</div>
+                <div class="event-node" data-title="Block event" data-time="10:47 PM" data-risk="Medium" data-source="Safety controls" data-detail="User triggered block response; follow-up contact resumed within four minutes.">
+                  <strong>Block event</strong>
+                  <span>Medium risk • Safety control trigger</span>
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="time-tag">10:51 PM</div>
+                <div class="event-node" data-title="New account detected" data-time="10:51 PM" data-risk="Medium" data-source="Account manager" data-detail="New account created within same activity cluster and linked to previous contact pattern.">
+                  <strong>New account detected</strong>
+                  <span>Medium risk • Account switching</span>
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="time-tag">11:03 PM</div>
+                <div class="event-node" data-title="Contact attempt" data-time="11:03 PM" data-risk="High" data-source="Messaging service" data-detail="Direct outreach after block event indicates possible behavioural persistence.">
+                  <strong>Contact attempt</strong>
+                  <span>High risk • Repeated contact</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <aside class="rightside">
+            <article class="panel relationship-panel">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <div class="panel-label">Threat association graph</div>
+                  <h2 class="panel-title">Linked entities</h2>
+                </div>
+                <div class="panel-tools">
+                  <button class="small-btn" type="button">Zoom In</button>
+                </div>
+              </div>
+              <div class="relationship-canvas">
+                <svg class="node-map" id="relationshipSvg" viewBox="0 0 420 280" preserveAspectRatio="xMidYMid meet"></svg>
+              </div>
+            </article>
+
+            <article class="panel cluster-panel">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <div class="panel-label">Behaviour clusters</div>
+                  <h2 class="panel-title">AI clustering</h2>
+                </div>
+              </div>
+              <div class="cluster-grid">
+                <div class="cluster-row">
+                  <div><strong>Repeated Contact</strong></div>
+                  <div class="metric-inline"><strong>142</strong><span>Events</span></div>
+                  <div class="metric-inline"><strong>91%</strong><span>Confidence</span></div>
+                  <span class="cluster-tag">High Risk</span>
+                </div>
+                <div class="cluster-row">
+                  <div><strong>Account Switching</strong></div>
+                  <div class="metric-inline"><strong>96</strong><span>Events</span></div>
+                  <div class="metric-inline"><strong>79%</strong><span>Confidence</span></div>
+                  <span class="cluster-tag">Suspicious</span>
+                </div>
+                <div class="cluster-row">
+                  <div><strong>Persistence Pattern</strong></div>
+                  <div class="metric-inline"><strong>68</strong><span>Events</span></div>
+                  <div class="metric-inline"><strong>84%</strong><span>Confidence</span></div>
+                  <span class="cluster-tag">Monitored</span>
+                </div>
+              </div>
+            </article>
+          </aside>
+        </section>
+
+        <section class="main-grid" style="margin-top: 18px;">
+          <article class="panel evidence-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Evidence vault</div>
+                <h2 class="panel-title">Digital evidence</h2>
+              </div>
+            </div>
+            <div class="evidence-list" style="padding: 16px 18px 18px;">
+              <div class="evidence-item">
+                <div>
+                  <strong>Message Evidence</strong>
+                  <div class="alert-meta">Type: chat • Timestamp: 10:42 PM • Source: Platform A</div>
+                </div>
+                <span class="tag green">Verified</span>
+              </div>
+              <div class="evidence-item">
+                <div>
+                  <strong>Account Evidence</strong>
+                  <div class="alert-meta">Type: account • Timestamp: 10:51 PM • Source: Account registry</div>
+                </div>
+                <span class="tag orange">Review</span>
+              </div>
+              <div class="evidence-item">
+                <div>
+                  <strong>Timeline Evidence</strong>
+                  <div class="alert-meta">Type: sequence • Timestamp: 10:42–11:03 PM • Source: event stream</div>
+                </div>
+                <span class="tag red">High</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel case-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Investigation</div>
+                <h2 class="panel-title">Case overview</h2>
+              </div>
+            </div>
+            <div class="case-grid">
+              <div class="case-box">
+                <strong>Case ID: CS-2048</strong>
+                <table>
+                  <tr><td>Investigation status</td><td>Open</td></tr>
+                  <tr><td>Created date</td><td>2026-09-26</td></tr>
+                  <tr><td>Last activity</td><td>11:09 PM</td></tr>
+                  <tr><td>Risk level</td><td>High</td></tr>
+                </table>
+                <div class="case-actions">
+                  <button class="action-btn primary" type="button">Add Evidence</button>
+                  <button class="action-btn" type="button">Generate Report</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="main-grid" style="margin-top: 18px;">
+          <article class="panel sim-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Threat simulator</div>
+                <h2 class="panel-title">Scenario control</h2>
+              </div>
+            </div>
+            <div class="sim-grid">
+              <div class="control">
+                <label for="messagesRange"><span>Messages / Hour</span><span id="messagesValue">42</span></label>
+                <input id="messagesRange" type="range" min="10" max="180" value="42" />
+              </div>
+              <div class="control">
+                <label for="attemptsRange"><span>Contact Attempts</span><span id="attemptsValue">31</span></label>
+                <input id="attemptsRange" type="range" min="5" max="120" value="31" />
+              </div>
+              <div class="control">
+                <label for="accountsRange"><span>Number of Accounts</span><span id="accountsValue">4</span></label>
+                <input id="accountsRange" type="range" min="1" max="12" value="4" />
+              </div>
+              <div class="control">
+                <label for="blockRange"><span>Block Events</span><span id="blockValue">7</span></label>
+                <input id="blockRange" type="range" min="0" max="20" value="7" />
+              </div>
+              <div class="control">
+                <label for="intervalRange"><span>Time Interval</span><span id="intervalValue">15m</span></label>
+                <input id="intervalRange" type="range" min="5" max="60" value="15" />
+              </div>
+              <div class="control">
+                <label for="escalationRange"><span>Escalation Rate</span><span id="escalationValue">62%</span></label>
+                <input id="escalationRange" type="range" min="10" max="100" value="62" />
+              </div>
+              <button class="primary-btn" id="runSimulationBtn" type="button">▶ Run Simulation</button>
+            </div>
+          </article>
+
+          <article class="panel report-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Report generator</div>
+                <h2 class="panel-title">What if analysis</h2>
+              </div>
+            </div>
+            <div class="whatif-grid">
+              <div class="whatif-box">
+                <strong>If contact frequency increases</strong>
+                <p>Projected behavioural pattern shifts toward persistence and higher risk. Simulated alert confidence rises by 8–12%.</p>
+              </div>
+              <div class="whatif-box">
+                <strong>If account switching increases</strong>
+                <p>Correlation strength increases between devices, profiles, and account clusters. Cross-platform links become more visible.</p>
+              </div>
+              <div class="whatif-box">
+                <strong>If block-evasion increases</strong>
+                <p>Risk indicator escalates sharply, reflecting a stronger behavioural signal tied to repeated access attempts after control actions.</p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="main-grid" style="margin-top: 18px;">
+          <article class="panel report-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Security report</div>
+                <h2 class="panel-title">AI explanation</h2>
+              </div>
+            </div>
+            <div class="report-grid">
+              <div class="report-box">
+                <strong>Why was this flagged?</strong>
+                <p>Multiple behavioural signals contributed to this alert: high contact frequency, repeated interaction attempts, account switching, and block-evasion pattern. These are behavioural indicators only and should be reviewed by a human investigator.</p>
+              </div>
+              <div class="report-box">
+                <strong>Recommended review actions</strong>
+                <ul>
+                  <li>Validate sequence of contact attempts after blocking</li>
+                  <li>Review account relationship graph</li>
+                  <li>Check platform and device overlap</li>
+                  <li>Assess escalation patterns over 7-day window</li>
+                </ul>
+              </div>
+              <div class="report-actions">
+                <button class="action-btn primary" type="button">Generate PDF</button>
+                <button class="action-btn" type="button">Export JSON</button>
+                <button class="action-btn" type="button">Export CSV</button>
+                <button class="action-btn" type="button">Print Report</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel report-panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Search</div>
+                <h2 class="panel-title">Global filter</h2>
+              </div>
+            </div>
+            <div class="search-bar">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6"/><path d="M16 16 21 21"/></svg>
+                <label class="sr-only" for="globalSearch">Search events</label>
+                <input id="globalSearch" type="text" placeholder="Event ID, account, device, timestamp, behaviour, risk level" />
+              </div>
+            </div>
+            <div class="whatif-grid">
+              <div class="filter-row" id="riskFilters">
+                <button class="filter-tag active" type="button" data-filter="All">All</button>
+                <button class="filter-tag" type="button" data-filter="Low">Low</button>
+                <button class="filter-tag" type="button" data-filter="Monitored">Monitored</button>
+                <button class="filter-tag" type="button" data-filter="Suspicious">Suspicious</button>
+                <button class="filter-tag" type="button" data-filter="High Risk">High Risk</button>
+              </div>
+              <div class="filter-row">
+                <select class="tiny-select" aria-label="Date range filter">
+                  <option>Last 24 hours</option>
+                  <option selected>Last 7 days</option>
+                  <option>Last 30 days</option>
+                </select>
+                <select class="tiny-select" aria-label="Event type filter">
+                  <option>All event types</option>
+                  <option>Messages</option>
+                  <option>Contact attempts</option>
+                  <option>Account changes</option>
+                </select>
+                <select class="tiny-select" aria-label="Behaviour type filter">
+                  <option>All behaviours</option>
+                  <option>Persistence</option>
+                  <option>Switching</option>
+                  <option>Escalation</option>
+                </select>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal" id="investigationModal" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3 id="modalTitle">Investigation workspace</h3>
+          <button class="close-btn" type="button" id="closeModalBtn" aria-label="Close investigation modal">×</button>
+        </div>
+        <div class="modal-body">
+          <div>
+            <div class="case-form">
+              <div class="field">
+                <label for="caseId">Case ID</label>
+                <input class="text-input" id="caseId" type="text" value="CS-2048" />
+              </div>
+              <div class="field">
+                <label for="status">Investigation Status</label>
+                <input class="text-input" id="status" type="text" value="Open / Active" />
+              </div>
+              <div class="field">
+                <label for="createdDate">Created Date</label>
+                <input class="text-input" id="createdDate" type="text" value="2026-09-26" />
+              </div>
+              <div class="field">
+                <label for="lastActivity">Last Activity</label>
+                <input class="text-input" id="lastActivity" type="text" value="11:09 PM" />
+              </div>
+              <div class="field full">
+                <label for="riskLevelField">Risk Level</label>
+                <input class="text-input" id="riskLevelField" type="text" value="High risk" />
+              </div>
+              <div class="field full">
+                <label for="behavioralEvidence">Behavioural Evidence</label>
+                <textarea id="behavioralEvidence">Repeated contact attempts following blocking events; rapid account switching; elevated message frequency across multiple time windows.</textarea>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button class="secondary-btn" type="button" id="addNoteBtn">Add Note</button>
+              <button class="primary-btn" type="button" id="exportCaseBtn">Export Case</button>
+            </div>
+          </div>
+
+          <div class="side-panel">
+            <div class="mini-box">
+              <h4>Correlation</h4>
+              <div class="status-line"><span>Related events</span><strong>14</strong></div>
+              <div class="status-line"><span>Related accounts</span><strong>04</strong></div>
+              <div class="status-line"><span>Related devices</span><strong>02</strong></div>
+              <div class="status-line"><span>Related activity</span><strong>07</strong></div>
+            </div>
+            <div class="mini-box">
+              <h4>Risk explanation</h4>
+              <ul>
+                <li>High contact frequency</li>
+                <li>Repeated after block</li>
+                <li>Account switching</li>
+                <li>Escalation signal</li>
+              </ul>
+            </div>
+            <div class="mini-box">
+              <h4>Investigation guidance</h4>
+              <p style="margin:0;color:var(--muted);line-height:1.8;font-size:0.7rem;">Demonstration data only. Behavioural patterns should be reviewed with human oversight and appropriate policy controls.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="floating-toast" id="toast" role="status" aria-live="polite">Simulation updated. Threat indicators refreshed.</div>
+
+    <script>
+      const toast = document.getElementById('toast');
+      const modal = document.getElementById('investigationModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const simulateBtn = document.getElementById('simulateBtn');
+      const investigateBtn = document.getElementById('investigateBtn');
+      const addEvidenceBtn = document.getElementById('addEvidenceBtn');
+      const generateReportBtn = document.getElementById('generateReportBtn');
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(showToast.timeoutId);
+        showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+
+      function openModal() { modal.classList.add('show'); }
+      function closeModal() { modal.classList.remove('show'); }
+
+      investigateBtn.addEventListener('click', openModal);
+      addEvidenceBtn.addEventListener('click', openModal);
+      closeModalBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', function (event) {
+        if (event.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('show')) closeModal();
+      });
+
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.nav-btn').forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+          const label = btn.textContent.replace(/\s+\d+/, '').trim();
+          document.querySelector('.crumb strong').textContent = label || 'Command Center';
+        });
+      });
+
+      const networkData = [
+        { name: 'USER', x: 78, y: 132, color: '#64ffb4' },
+        { name: 'ACCOUNT', x: 160, y: 70, color: '#5dc9ff' },
+        { name: 'MESSAGE', x: 224, y: 165, color: '#ffbd59' },
+        { name: 'DEVICE', x: 304, y: 88, color: '#5dc9ff' },
+        { name: 'IP', x: 376, y: 136, color: '#ff5e7d' },
+        { name: 'TIMESTAMP', x: 448, y: 210, color: '#64ffb4' },
+        { name: 'PLATFORM', x: 400, y: 300, color: '#5dc9ff' },
+        { name: 'LOCATION', x: 220, y: 290, color: '#ffbd59' },
+        { name: 'EVENT', x: 120, y: 270, color: '#ff5e7d' }
+      ];
+
+      function drawNetwork() {
+        const svg = document.getElementById('networkSvg');
+        svg.innerHTML = '';
+
+        const connections = [
+          [0,1],[1,3],[1,2],[2,5],[3,4],[4,5],[5,6],[6,7],[7,8],[8,0],[2,7],[1,8],[3,7],[4,8]
+        ];
+
+        connections.forEach(([a, b], index) => {
+          const from = networkData[a];
+          const to = networkData[b];
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', from.x);
+          line.setAttribute('y1', from.y);
+          line.setAttribute('x2', to.x);
+          line.setAttribute('y2', to.y);
+          line.setAttribute('stroke', index % 3 === 0 ? '#64ffb4' : index % 3 === 1 ? '#5dc9ff' : '#ffbd59');
+          line.setAttribute('stroke-width', index % 4 === 0 ? '1.6' : '1.2');
+          line.setAttribute('opacity', '0.8');
+          line.setAttribute('filter', 'url(#glowBlue)');
+          svg.appendChild(line);
+        });
+
+        networkData.forEach((node, index) => {
+          const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', index % 2 === 0 ? '20' : '17');
+          circle.setAttribute('fill', node.color + '22');
+          circle.setAttribute('stroke', node.color);
+          circle.setAttribute('stroke-width', '1.4');
+          circle.setAttribute('filter', 'url(#glowBlue)');
+
+          const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          label.setAttribute('x', node.x);
+          label.setAttribute('y', node.y + 4);
+          label.setAttribute('text-anchor', 'middle');
+          label.setAttribute('fill', '#eaf9ff');
+          label.setAttribute('font-size', '10');
+          label.setAttribute('font-weight', '700');
+          label.setAttribute('letter-spacing', '1.6');
+          label.textContent = node.name;
+
+          group.appendChild(circle);
+          group.appendChild(label);
+          svg.appendChild(group);
+        });
+      }
+
+      drawNetwork();
+
+      const relationshipSvg = document.getElementById('relationshipSvg');
+      function drawRelationshipMap() {
+        relationshipSvg.innerHTML = '';
+        const nodes = [
+          { name: 'ACCOUNT A', x: 90, y: 60 },
+          { name: 'DEVICE 01', x: 150, y: 130 },
+          { name: 'IP EVENT', x: 215, y: 80 },
+          { name: 'ACCOUNT B', x: 315, y: 120 },
+          { name: 'CONTACT EVENT', x: 245, y: 200 },
+          { name: 'BEHAVIOUR CLUSTER', x: 120, y: 210 }
+        ];
+        const lines = [
+          [0,1],[1,2],[2,3],[3,4],[4,5],[5,0]
+        ];
+
+        lines.forEach(([a,b]) => {
+          const from = nodes[a];
+          const to = nodes[b];
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', from.x);
+          line.setAttribute('y1', from.y);
+          line.setAttribute('x2', to.x);
+          line.setAttribute('y2', to.y);
+          line.setAttribute('stroke', '#5dc9ff');
+          line.setAttribute('stroke-width', '1.5');
+          line.setAttribute('opacity', '0.75');
+          line.setAttribute('filter', 'url(#glowBlue)');
+          relationshipSvg.appendChild(line);
+        });
+
+        nodes.forEach((node, index) => {
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', index === 5 ? '24' : '16');
+          circle.setAttribute('fill', index === 5 ? 'rgba(100,255,180,0.18)' : 'rgba(93,201,255,0.12)');
+          circle.setAttribute('stroke', index === 5 ? '#64ffb4' : '#5dc9ff');
+          circle.setAttribute('stroke-width', '1.6');
+          relationshipSvg.appendChild(circle);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', node.x); text.setAttribute('y', node.y + 4);
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('font-size', '9');
+          text.setAttribute('fill', '#eaf9ff');
+          text.textContent = node.name;
+          relationshipSvg.appendChild(text);
+        });
+      }
+
+      drawRelationshipMap();
+
+      function drawActivityChart() {
+        const canvas = document.getElementById('activityChart');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const width = rect.width;
+        const height = rect.height;
+        ctx.clearRect(0, 0, width, height);
+
+        const pad = { top: 18, right: 18, bottom: 28, left: 28 };
+        const graphWidth = width - pad.left - pad.right;
+        const graphHeight = height - pad.top - pad.bottom;
+
+        const xStep = graphWidth / 7;
+        const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+        ctx.strokeStyle = 'rgba(120, 146, 165, 0.18)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const y = pad.top + (graphHeight / 4) * i;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y);
+          ctx.lineTo(width - pad.right, y);
+          ctx.stroke();
+        }
+
+        const contact = [18, 34, 29, 52, 48, 63, 56];
+        const block = [10, 18, 15, 26, 20, 32, 28];
+
+        function plot(points, color, lineWidth) {
+          ctx.beginPath();
+          points.forEach((point, index) => {
+            const x = pad.left + xStep * index + xStep / 2;
+            const y = pad.top + graphHeight - (point / 80) * (graphHeight - 18);
+            if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          });
+          ctx.lineWidth = lineWidth;
+          ctx.strokeStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 16;
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+
+          points.forEach((point, index) => {
+            const x = pad.left + xStep * index + xStep / 2;
+            const y = pad.top + graphHeight - (point / 80) * (graphHeight - 18);
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.arc(x, y, 3.3, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        plot(contact, '#5dc9ff', 2.4);
+        plot(block, '#ff5e7d', 2.2);
+
+        ctx.fillStyle = '#86a4b2';
+        ctx.font = '11px sans-serif';
+        labels.forEach((label, index) => {
+          const x = pad.left + xStep * index + xStep / 2;
+          ctx.fillText(label, x - 10, height - 8);
+        });
+      }
+
+      drawActivityChart();
+      window.addEventListener('resize', () => {
+        drawActivityChart();
+      });
+
+      const timelineNodes = document.querySelectorAll('.event-node');
+      timelineNodes.forEach((node) => {
+        node.addEventListener('click', () => {
+          timelineNodes.forEach((item) => item.classList.remove('active'));
+          node.classList.add('active');
+          const title = node.dataset.title;
+          const detail = node.dataset.detail;
+          const risk = node.dataset.risk;
+          const source = node.dataset.source;
+          const time = node.dataset.time;
+
+          const detailCard = document.createElement('div');
+          detailCard.className = 'detail-card';
+          detailCard.innerHTML = `
+            <h3>${title}</h3>
+            <div class="detail-grid">
+              <div class="detail-item"><label>Timestamp</label><strong>${time}</strong></div>
+              <div class="detail-item"><label>Source</label><strong>${source}</strong></div>
+              <div class="detail-item"><label>Risk</label><strong>${risk}</strong></div>
+              <div class="detail-item"><label>Confidence</label><strong>89%</strong></div>
+            </div>
+            <div class="detail-item" style="margin-top:12px;"><label>Analysis</label><strong>${detail}</strong></div>
+          `;
+
+          const existingDetail = document.querySelector('.detail-card');
+          if (existingDetail) existingDetail.remove();
+          document.querySelector('.timeline-panel').appendChild(detailCard);
+        });
+      });
+
+      const sliders = [
+        { id: 'messagesRange', valueId: 'messagesValue', suffix: '' },
+        { id: 'attemptsRange', valueId: 'attemptsValue', suffix: '' },
+        { id: 'accountsRange', valueId: 'accountsValue', suffix: '' },
+        { id: 'blockRange', valueId: 'blockValue', suffix: '' },
+        { id: 'intervalRange', valueId: 'intervalValue', suffix: 'm' },
+        { id: 'escalationRange', valueId: 'escalationValue', suffix: '%' }
+      ];
+
+      sliders.forEach(({ id, valueId, suffix }) => {
+        const input = document.getElementById(id);
+        const output = document.getElementById(valueId);
+        input.addEventListener('input', () => {
+          output.textContent = `${input.value}${suffix}`;
+        });
+      });
+
+      const riskFilters = document.querySelectorAll('[data-filter]');
+      riskFilters.forEach((tag) => {
+        tag.addEventListener('click', () => {
+          riskFilters.forEach((item) => item.classList.remove('active'));
+          tag.classList.add('active');
+          showToast(`Filter updated: ${tag.dataset.filter}`);
+        });
+      });
+
+      document.getElementById('globalSearch').addEventListener('input', function () {
+        const value = this.value.trim().toLowerCase();
+        const nodes = document.querySelectorAll('.alert-item, .event-node, .cluster-row');
+        nodes.forEach((node) => {
+          const text = node.textContent.toLowerCase();
+          node.style.display = text.includes(value) || !value ? '' : 'none';
+        });
+      });
+
+      function updateRiskFromSimulation() {
+        const messages = Number(document.getElementById('messagesRange').value);
+        const attempts = Number(document.getElementById('attemptsRange').value);
+        const accounts = Number(document.getElementById('accountsRange').value);
+        const blocks = Number(document.getElementById('blockRange').value);
+        const escalation = Number(document.getElementById('escalationRange').value);
+
+        let score = 48 + (messages / 2) + (attempts / 2) + (accounts * 3) + (blocks * 2) + (escalation / 2);
+        score = Math.min(98, Math.max(38, Math.round(score)));
+
+        document.getElementById('threatRisk').textContent = score;
+        document.getElementById('riskBarFill').style.width = `${score}%`;
+        document.querySelector('.ring').style.background = `conic-gradient(var(--red) 0 ${score}%, rgba(255,255,255,0.06) ${score}% 100%)`;
+        const level = score >= 80 ? 'High Risk' : score >= 65 ? 'Suspicious' : score >= 50 ? 'Monitored' : 'Low';
+        const riskText = document.querySelector('.risk-level');
+        const riskCaption = document.querySelector('.risk-caption');
+        riskText.textContent = level;
+        riskText.style.color = level === 'High Risk' ? 'var(--red)' : level === 'Suspicious' ? 'var(--amber)' : level === 'Monitored' ? 'var(--cyan)' : 'var(--green)';
+        riskCaption.textContent = level === 'High Risk'
+          ? 'Simulated behavioural indicators suggest repeated contact attempts and elevated block-evasion patterns.'
+          : level === 'Suspicious'
+          ? 'Multiple behavioural signals are interacting across multiple channels and time windows.'
+          : level === 'Monitored'
+          ? 'The behaviour pattern is currently under active observation and correlation.'
+          : 'No significant pattern escalation is currently detected in simulated data.';
+
+        document.getElementById('highRiskEvents').textContent = Math.min(99, Math.max(12, Math.round(score / 2 + blocks * 2)));
+      }
+
+      document.getElementById('runSimulationBtn').addEventListener('click', () => {
+        updateRiskFromSimulation();
+        showToast('Simulation updated. Threat indicators refreshed.');
+      });
+
+      document.getElementById('generateReportBtn').addEventListener('click', () => {
+        const summary = [
+          'Case Summary: Simulated behavioural risk analysis report generated.',
+          'Risk Overview: Elevated threat score with repeated contact and post-block interaction signals.',
+          'Behaviour Patterns: Persistence, contact frequency, account switching, block evasion.',
+          'Recommendations: Human review, cross-account correlation, device verification.'
+        ].join('\n');
+        showToast('Security report generated.');
+        console.log(summary);
+      });
+
+      document.getElementById('simulateBtn').addEventListener('click', () => {
+        updateRiskFromSimulation();
+        showToast('Threat simulation running.');
+      });
+
+      const originalTotal = 1284;
+      const originalSuspicious = 217;
+      const originalHigh = 43;
+      const originalClusters = 12;
+      const originalCases = 7;
+      const originalConfidence = 94;
+
+      function animateCounter(elementId, start, end, step, suffix = '') {
+        const el = document.getElementById(elementId);
+        let current = start;
+        const timer = setInterval(() => {
+          current += step;
+          if ((step > 0 && current >= end) || (step < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
+          }
+          el.textContent = `${current}${suffix}`;
+        }, 35);
+      }
+
+      document.getElementById('simulateBtn').addEventListener('click', () => {
+        const score = Number(document.getElementById('threatRisk').textContent || 87);
+        animateCounter('totalEvents', originalTotal, originalTotal + 24, 2);
+        animateCounter('suspiciousEvents', originalSuspicious, originalSuspicious + 18, 2);
+        animateCounter('highRiskEvents', originalHigh, Math.min(99, score / 2 + 12), 1);
+        animateCounter('clusterCount', originalClusters, originalClusters + 2, 1);
+        animateCounter('activeCases', originalCases, originalCases + 1, 1, '');
+        animateCounter('confidenceLevel', originalConfidence, Math.min(99, originalConfidence + 3), 1, '%');
+      });
+
+      const liveSignalScores = document.querySelectorAll('.signal-score');
+      let signalPulse = 0;
+      const signalPhase = [82, 74, 68, 86, 79, 71, 76];
+
+      setInterval(() => {
+        liveSignalScores.forEach((scoreEl, index) => {
+          const base = signalPhase[(index + signalPulse) % signalPhase.length];
+          const offset = Math.floor(Math.random() * 7) - 2;
+          const value = Math.min(98, Math.max(52, base + offset));
+          scoreEl.textContent = `${value}%`;
+          const meter = scoreEl.closest('.signal-card').querySelector('.signal-meter span');
+          if (meter) meter.style.width = `${value}%`;
+        });
+        signalPulse += 1;
+      }, 2200);
+
+      updateRiskFromSimulation();
+    </script>
+  </body>
+</html>

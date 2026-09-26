@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBERSTALK // COMMAND CENTER</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="panel-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="brand">
+          <div class="brand-mark"><span>CS</span></div>
+          <div class="brand-copy">
+            <strong>CYBERSTALK</strong>
+            AI DEFENSE
+          </div>
+        </div>
+
+        <div class="nav-stack">
+          <button class="nav-btn active" type="button"><span>▣</span> Command Center</button>
+          <button class="nav-btn" type="button"><span>◌</span> Behaviour Analysis</button>
+          <button class="nav-btn" type="button"><span>◎</span> Threat Graph</button>
+          <button class="nav-btn" type="button"><span>△</span> Timeline</button>
+          <button class="nav-btn" type="button"><span>◍</span> Risk Intelligence</button>
+          <button class="nav-btn" type="button"><span>▤</span> Evidence</button>
+          <button class="nav-btn" type="button"><span>▣</span> Alerts <small>3</small></button>
+          <button class="nav-btn" type="button" onclick="location.href='report.html'"><span>☰</span> Reports</button>
+          <button class="nav-btn" type="button"><span>◈</span> Simulation</button>
+          <button class="nav-btn" type="button"><span>⚙</span> Settings</button>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="info-card">
+            <div class="head">● Privacy-first mode</div>
+            <p>Behavioural analysis is probabilistic and should support, not replace, human investigation.</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <header class="topbar">
+          <div class="crumb">Workspace / <strong>Command Center</strong></div>
+          <div class="status-group">
+            <div class="status-pill"><span class="pulse"></span> System online</div>
+            <button class="small-btn primary" type="button" id="dashboardReportBtn">Generate report</button>
+            <button class="small-btn" type="button" id="logoutBtn">Sign out</button>
+            <div class="user-badge">AI</div>
+          </div>
+        </header>
+
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <div class="panel-title-wrap">
+                <div class="panel-label">Threat intelligence platform</div>
+                <h2 class="panel-title">Cyberstalking behaviour detector</h2>
+              </div>
+              <div class="panel-tools">
+                <button class="small-btn primary" type="button" onclick="location.href='report.html'">Run simulation</button>
+                <button class="small-btn" type="button">Investigate</button>
+              </div>
+            </div>
+            <div class="report-body">
+              <div class="signal-board">
+                <div class="panel signal-panel">
+                  <div class="panel-head">
+                    <div class="panel-title-wrap">
+                      <div class="panel-label">AI signal map</div>
+                      <h2 class="panel-title">Signal layers</h2>
+                    </div>
+                  </div>
+                  <div class="signal-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px 18px 18px;">
+                    <div class="signal-card">
+                      <div class="signal-head"><strong>Cross-platform</strong><span class="signal-score">82%</span></div>
+                      <p>Repeated exposure patterns across messaging, account, and device contexts.</p>
+                      <div class="signal-meter"><span style="width:82%"></span></div>
+                    </div>
+                    <div class="signal-card">
+                      <div class="signal-head"><strong>Pressure pattern</strong><span class="signal-score">74%</span></div>
+                      <p>Behavioural pressure appears to increase after block events and failed disengagement.</p>
+                      <div class="signal-meter"><span style="width:74%"></span></div>
+                    </div>
+                    <div class="signal-card">
+                      <div class="signal-head"><strong>Re-identification</strong><span class="signal-score">68%</span></div>
+                      <p>Related identifiers show moderate linkage through account overlap and contact timing.</p>
+                      <div class="signal-meter"><span style="width:68%"></span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="panel signal-panel">
+                  <div class="panel-head">
+                    <div class="panel-title-wrap">
+                      <div class="panel-label">Threat brief</div>
+                      <h2 class="panel-title">Live insight</h2>
+                    </div>
+                  </div>
+                  <div class="brief-box">
+                    <div class="brief-label">System interpretation</div>
+                    <h3>Escalation is sustained</h3>
+                    <p>Signal overlap indicates persistent contact attempts, repeated re-engagement, and a concentrated post-block escalation pattern.</p>
+                    <ul class="brief-list">
+                      <li><span>Contact persistence</span><span>High</span></li>
+                      <li><span>Risk acceleration</span><span>Active</span></li>
+                      <li><span>Cross-account correlation</span><span>Moderate</span></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="stats-grid" aria-label="dashboard statistics">
+            <article class="stat-card red">
+              <div class="stat-label">Total events</div>
+              <div class="stat-value"><strong id="totalEvents">1284</strong><span class="stat-note">demo</span></div>
+            </article>
+            <article class="stat-card blue">
+              <div class="stat-label">Suspicious events</div>
+              <div class="stat-value"><strong id="suspiciousEvents">217</strong><span class="stat-note">+12%</span></div>
+            </article>
+            <article class="stat-card red">
+              <div class="stat-label">High-risk events</div>
+              <div class="stat-value"><strong id="highRiskEvents">43</strong><span class="stat-note">urgent</span></div>
+            </article>
+            <article class="stat-card purple">
+              <div class="stat-label">Behaviour clusters</div>
+              <div class="stat-value"><strong id="clusterCount">12</strong><span class="stat-note">active</span></div>
+            </article>
+            <article class="stat-card green">
+              <div class="stat-label">Active cases</div>
+              <div class="stat-value"><strong id="activeCases">07</strong><span class="stat-note">open</span></div>
+            </article>
+            <article class="stat-card blue">
+              <div class="stat-label">System confidence</div>
+              <div class="stat-value"><strong id="confidenceLevel">94%</strong><span class="stat-note">AI</span></div>
+            </article>
+          </section>
+
+          <section class="main-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <div class="panel-label">Threat graph</div>
+                  <h2 class="panel-title">Live activity</h2>
+                </div>
+                <div class="panel-tools">
+                  <button class="small-btn primary" type="button">Zoom</button>
+                  <button class="small-btn" type="button">Reset</button>
+                  <select class="tiny-select" aria-label="Graph time range">
+                    <option>24H</option>
+                    <option selected>7D</option>
+                    <option>30D</option>
+                    <option>Custom</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="activityChart" aria-label="Behaviour event graph"></canvas>
+              </div>
+              <div class="legend">
+                <span class="legend-item"><span class="legend-swatch"></span> Contact attempts</span>
+                <span class="legend-item"><span class="legend-swatch alt"></span> Block events</span>
+              </div>
+            </article>
+
+            <aside class="panel risk-panel" aria-label="Threat risk assessment">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <div class="panel-label">Risk intelligence</div>
+                  <h2 class="panel-title">Threat risk</h2>
+                </div>
+              </div>
+              <div class="risk-wrap">
+                <div class="risk-score-shell">
+                  <div class="ring" aria-label="Risk score 87 percent">
+                    <div class="ring-value"><strong id="threatRisk">87</strong><small>%</small></div>
+                  </div>
+                  <div class="risk-text">
+                    <div class="risk-level">High Risk</div>
+                    <div class="risk-caption">Simulated behavioural indicators suggest repeated contact attempts and elevated block-evasion patterns.</div>
+                  </div>
+                </div>
+                <div class="risk-bar"><span id="riskBarFill"></span></div>
+                <div class="risk-scale"><span>Low</span><span>Moderate</span><span>Elevated</span></div>
+
+                <div class="factor-list">
+                  <div class="factor"><span class="factor-name">Message Frequency</span><span class="factor-value">82%</span><div class="factor-track"><span style="width:82%"></span></div></div>
+                  <div class="factor"><span class="factor-name">Repeated Contact</span><span class="factor-value">76%</span><div class="factor-track"><span style="width:76%"></span></div></div>
+                  <div class="factor"><span class="factor-name">Account Switching</span><span class="factor-value">64%</span><div class="factor-track"><span style="width:64%"></span></div></div>
+                  <div class="factor"><span class="factor-name">Block Evasion</span><span class="factor-value">91%</span><div class="factor-track"><span style="width:91%"></span></div></div>
+                  <div class="factor"><span class="factor-name">Escalation Pattern</span><span class="factor-value">79%</span><div class="factor-track"><span style="width:79%"></span></div></div>
+                </div>
+              </div>
+            </aside>
+          </section>
+
+          <section class="main-grid">
+            <article class="panel">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <div class="panel-label">Alert center</div>
+                  <h2 class="panel-title">Live alerts</h2>
+                </div>
+              </div>
+              <div class="alert-list">
+                <div class="alert-item"><span class="alert-pill high">High</span><div class="alert-body"><strong>Repeated contact detected</strong><div class="alert-meta">02:14:13 • Event ID 4018 • Confidence 94%</div></div><div class="alert-actions"><button class="small-btn" type="button">View</button></div></div>
+                <div class="alert-item"><span class="alert-pill high">High</span><div class="alert-body"><strong>Multiple accounts correlated</strong><div class="alert-meta">01:44:09 • Event ID 3981 • Confidence 90%</div></div><div class="alert-actions"><button class="small-btn" type="button">Investigate</button></div></div>
+                <div class="alert-item"><span class="alert-pill medium">Medium</span><div class="alert-body"><strong>Contact attempts increased</strong><div class="alert-meta">00:58:13 • Event ID 3910 • Confidence 82%</div></div><div class="alert-actions"><button class="small-btn" type="button">Review</button></div></div>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head">
+                <div class="panel-title-wrap">
+                  <div class="panel-label">Threat summary</div>
+                  <h2 class="panel-title">Investigation snapshot</h2>
+                </div>
+              </div>
+              <div class="report-body">
+                <div class="preview-box">
+                  <h4>Case ID: CS-2048</h4>
+                  <p>High-risk behavioural cluster linked to repeated contact attempts after lockout periods. Entity correlation indicates elevated confidence in cross-account patterning.</p>
+                </div>
+                <div class="preview-box">
+                  <h4>Recommended actions</h4>
+                  <ul>
+                    <li>Validate sequence of after-block contact attempts.</li>
+                    <li>Review account mapping and device overlap.</li>
+                    <li>Escalate to human investigator for pattern confirmation.</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast">Dashboard loaded.</div>
+    <script src="script.js"></script>
+  </body>
+</html>

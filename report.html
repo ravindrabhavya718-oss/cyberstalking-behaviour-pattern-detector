@@ -102,11 +102,6 @@
     <div class="toast" id="toast">Report generated.</div>
     <script src="script.js"></script>
     <script>
-      document.getElementById('generatePdfBtn').addEventListener('click', function () {
-        const title = document.getElementById('reportTitle').value || 'Behaviour escalation summary';
-        showToast(`${title} generated.`);
-      });
-
       document.getElementById('exportJsonBtn').addEventListener('click', function () {
         const data = {
           title: document.getElementById('reportTitle').value,

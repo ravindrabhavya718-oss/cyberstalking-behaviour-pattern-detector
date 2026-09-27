@@ -12,3 +12,4 @@ Thumbs.db
 
 # Local runtime files
 .cache/
+data/

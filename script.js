@@ -7,6 +7,39 @@ function showToast(message) {
   showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
+async function apiRequest(path, options = {}) {
+  const response = await fetch(path, {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || 'Request failed.');
+  return payload;
+}
+
+function setSession(user) {
+  if (user) localStorage.setItem('cyberstalkSession', JSON.stringify(user));
+  else localStorage.removeItem('cyberstalkSession');
+}
+
+async function loadDashboardData() {
+  const data = await apiRequest('/api/dashboard');
+  Object.entries(data.stats).forEach(([key, value]) => {
+    const element = document.getElementById(key);
+    if (element) element.textContent = key === 'activeCases' ? String(value).padStart(2, '0') : `${value}${key === 'confidenceLevel' ? '%' : ''}`;
+  });
+  const riskBar = document.getElementById('riskBarFill');
+  if (riskBar) riskBar.style.width = `${data.stats.threatRisk}%`;
+  document.querySelectorAll('.signal-score').forEach((element, index) => {
+    const value = data.signals[index];
+    if (value !== undefined) {
+      element.textContent = `${value}%`;
+      const meter = element.closest('.signal-card')?.querySelector('.signal-meter span');
+      if (meter) meter.style.width = `${value}%`;
+    }
+  });
+}
+
 function initDashboard() {
   const svg = document.getElementById('networkSvg');
   if (!svg) return;
@@ -165,29 +198,21 @@ if (document.getElementById('loginForm')) {
   document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
     const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if (!email || !password) {
-      showToast('Please complete both fields.');
-      return;
-    }
-    localStorage.setItem('cyberstalkSession', JSON.stringify({ email, authenticated: true }));
-    showToast('Authentication successful. Redirecting...');
-    setTimeout(() => location.href = 'dashboard.html', 1200);
+    const password = document.getElementById('password').value;
+    apiRequest('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+      .then(({ user }) => {
+        setSession(user);
+        showToast('Authentication successful. Redirecting...');
+        setTimeout(() => location.href = 'dashboard.html', 700);
+      })
+      .catch((error) => showToast(error.message));
   });
 }
 
 const session = localStorage.getItem('cyberstalkSession');
-if (location.pathname.endsWith('login.html') && session) {
-  location.href = 'dashboard.html';
-}
-
-if (location.pathname.endsWith('dashboard.html') && !session) {
-  location.href = 'login.html';
-}
-
-if (location.pathname.endsWith('report.html') && !session) {
-  location.href = 'login.html';
-}
+if ((location.pathname.endsWith('dashboard.html') || location.pathname.endsWith('report.html')) && !session) location.href = 'login.html';
+if (location.pathname.endsWith('login.html') && session) location.href = 'dashboard.html';
+if (document.querySelector('.dashboard-grid')) loadDashboardData().catch(() => showToast('Dashboard data unavailable.'));
 
 if (document.getElementById('launchPlatformBtn')) {
   const launchBtn = document.getElementById('launchPlatformBtn');
@@ -206,15 +231,23 @@ if (document.getElementById('dashboardReportBtn')) {
 
 if (document.getElementById('generatePdfBtn')) {
   document.getElementById('generatePdfBtn').addEventListener('click', function () {
-    const title = document.getElementById('reportTitle')?.value || 'Behaviour escalation summary';
-    showToast(`${title} generated.`);
+    const payload = {
+      title: document.getElementById('reportTitle')?.value || 'Behaviour escalation summary',
+      type: document.getElementById('reportType')?.value,
+      summary: document.getElementById('reportSummary')?.value
+    };
+    apiRequest('/api/reports', { method: 'POST', body: JSON.stringify(payload) })
+      .then(({ report }) => showToast(`${report.title} saved to the report vault.`))
+      .catch((error) => showToast(error.message));
   });
 }
 
 if (document.getElementById('logoutBtn')) {
   document.getElementById('logoutBtn').addEventListener('click', function () {
-    localStorage.removeItem('cyberstalkSession');
-    location.href = 'login.html';
+    apiRequest('/api/auth/logout', { method: 'POST' }).finally(() => {
+      setSession(null);
+      location.href = 'login.html';
+    });
   });
 }
 

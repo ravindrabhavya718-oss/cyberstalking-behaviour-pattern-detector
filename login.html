@@ -6,48 +6,69 @@
     <title>Cyberstalk // Secure Access</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="login-page">
     <div class="login-shell">
-      <div class="login-card">
-        <div class="login-visual">
-          <span class="mini-tag">Threat intelligence access</span>
-          <h2>Cyberstalking behaviour network</h2>
-          <p>Operational awareness for behavioural risk monitoring, account correlation, and digital evidence triage across distributed online environments.</p>
-
-          <div class="security-panel">
-            <div class="security-pill"><span>Secure session</span><span>Active</span></div>
-            <div class="security-pill"><span>Policy mode</span><span>Human review</span></div>
-            <div class="security-pill"><span>Signal confidence</span><span>94%</span></div>
+      <main class="login-card">
+        <section class="login-visual" aria-label="Cyberstalk analyst platform">
+          <div class="login-brand-row">
+            <div class="login-brand-mark" aria-hidden="true"><span>CS</span></div>
+            <div class="login-brand-copy"><strong>CYBERSTALK</strong><span>BEHAVIOUR INTELLIGENCE</span></div>
+            <span class="login-node-status"><i aria-hidden="true"></i>LOCAL NODE</span>
           </div>
-        </div>
 
-        <div class="login-form-wrap">
-          <h3>Welcome back</h3>
-          <p>Authenticate to access the analyst workspace.</p>
+          <div class="login-visual-copy">
+            <span class="mini-tag">DEFENSIVE ANALYSIS PLATFORM</span>
+            <h1>Digital behaviour.<br /><span>Clear context.</span></h1>
+            <p>Review reported activity patterns with explainable indicators, preserved timelines, and human oversight.</p>
+          </div>
 
-          <form id="loginForm">
-            <div class="form-group">
-              <label class="form-label" for="email">Email address</label>
-              <input class="text-input" id="email" type="email" placeholder="analyst@cyberstalk.ai" required />
+          <div class="login-signal-panel" aria-label="Local analysis environment status">
+            <div class="login-signal-head"><span>OBSERVATION ENGINE</span><span>DEMO ENVIRONMENT</span></div>
+            <div class="login-signal-graph" aria-hidden="true">
+              <span style="--bar-height:28%"></span><span style="--bar-height:44%"></span><span style="--bar-height:36%"></span><span style="--bar-height:63%"></span><span style="--bar-height:51%"></span><span style="--bar-height:78%"></span><span style="--bar-height:62%"></span><span style="--bar-height:86%"></span><span style="--bar-height:68%"></span><span style="--bar-height:92%"></span><span style="--bar-height:73%"></span><span style="--bar-height:82%"></span>
+              <svg viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 90 C45 78 50 55 95 70 S155 88 190 49 S250 61 285 42 S340 54 385 26 S440 51 480 30 S540 42 600 12" /></svg>
             </div>
-
-            <div class="form-group">
-              <label class="form-label" for="password">Password</label>
-              <input class="text-input" id="password" type="password" placeholder="Enter your password" required />
+            <div class="login-signal-stats">
+              <div><span>SCORING</span><strong>Explainable</strong></div>
+              <div><span>DATA SOURCE</span><strong>Synthetic</strong></div>
+              <div><span>REVIEW MODEL</span><strong>Human-led</strong></div>
             </div>
+          </div>
+          <div class="login-visual-foot"><span>NO LIVE ACCOUNT MONITORING</span><span>PRIVACY-FIRST WORKSPACE</span></div>
+        </section>
 
-            <div class="form-row">
-              <label class="check-wrap"><input id="rememberMe" type="checkbox" /> Remember me</label>
-              <span class="form-hint">Local demo credentials are stored only on this device.</span>
-            </div>
+        <section class="login-form-wrap" aria-labelledby="loginTitle">
+          <div class="login-form-top"><span>ANALYST WORKSPACE</span><span class="login-access-mark"><i aria-hidden="true"></i>SECURE ACCESS</span></div>
+          <div class="login-form-content">
+            <span class="login-eyebrow">IDENTITY VERIFICATION</span>
+            <h2 id="loginTitle">Welcome back.</h2>
+            <p>Sign in to continue, or enter a new email to create a local analyst account.</p>
 
-            <div class="login-actions">
-              <button class="btn btn-primary" type="submit">Sign in</button>
-              <button class="btn btn-ghost" type="button" id="demoAccessBtn">Demo access</button>
-            </div>
-          </form>
-        </div>
-      </div>
+            <form id="loginForm">
+              <div class="form-group">
+                <label class="form-label" for="email">Email address</label>
+                <input class="text-input" id="email" name="email" type="email" autocomplete="username" placeholder="analyst@organization.com" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input class="text-input" id="password" name="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required />
+              </div>
+
+              <div class="form-row">
+                <label class="check-wrap"><input id="rememberMe" type="checkbox" /> Keep me signed in</label>
+                <span class="login-session-note">Up to 30 days</span>
+              </div>
+
+              <div class="login-actions">
+                <button class="btn btn-primary" type="submit">Sign in</button>
+                <button class="btn btn-ghost" type="button" id="demoAccessBtn">Enter demo workspace</button>
+              </div>
+            </form>
+            <div class="login-form-foot"><span class="login-foot-mark">CS</span><span>Local data stays in this workspace.<br />Behavioural indicators are not findings of intent.</span></div>
+          </div>
+        </section>
+      </main>
     </div>
 
     <div class="toast" id="toast">Authentication successful.</div>

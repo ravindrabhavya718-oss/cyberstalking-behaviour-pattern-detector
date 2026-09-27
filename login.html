@@ -37,13 +37,13 @@
             </div>
 
             <div class="form-row">
-              <label class="check-wrap"><input type="checkbox" /> Remember me</label>
-              <a href="#" class="linkish">Reset access</a>
+              <label class="check-wrap"><input id="rememberMe" type="checkbox" /> Remember me</label>
+              <span class="form-hint">Local demo credentials are stored only on this device.</span>
             </div>
 
             <div class="login-actions">
               <button class="btn btn-primary" type="submit">Sign in</button>
-              <button class="btn btn-ghost" type="button" onclick="location.href='index.html'">Demo access</button>
+              <button class="btn btn-ghost" type="button" id="demoAccessBtn">Demo access</button>
             </div>
           </form>
         </div>
@@ -52,6 +52,6 @@
 
     <div class="toast" id="toast">Authentication successful.</div>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

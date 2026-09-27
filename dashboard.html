@@ -18,16 +18,16 @@
         </div>
 
         <div class="nav-stack">
-          <button class="nav-btn active" type="button"><span>▣</span> Command Center</button>
-          <button class="nav-btn" type="button"><span>◌</span> Behaviour Analysis</button>
-          <button class="nav-btn" type="button"><span>◎</span> Threat Graph</button>
-          <button class="nav-btn" type="button"><span>△</span> Timeline</button>
-          <button class="nav-btn" type="button"><span>◍</span> Risk Intelligence</button>
-          <button class="nav-btn" type="button"><span>▤</span> Evidence</button>
-          <button class="nav-btn" type="button"><span>▣</span> Alerts <small>3</small></button>
-          <button class="nav-btn" type="button" onclick="location.href='report.html'"><span>☰</span> Reports</button>
-          <button class="nav-btn" type="button"><span>◈</span> Simulation</button>
-          <button class="nav-btn" type="button"><span>⚙</span> Settings</button>
+          <button class="nav-btn active" type="button" data-target="overviewSection"><span>▣</span> Command Center</button>
+          <button class="nav-btn" type="button" data-target="analysisSection"><span>◌</span> Behaviour Analysis</button>
+          <button class="nav-btn" type="button" data-target="graphSection"><span>◎</span> Threat Graph</button>
+          <button class="nav-btn" type="button" data-target="timelineSection"><span>△</span> Timeline</button>
+          <button class="nav-btn" type="button" data-target="riskSection"><span>◍</span> Risk Intelligence</button>
+          <button class="nav-btn" type="button" data-target="evidenceSection"><span>▤</span> Evidence</button>
+          <button class="nav-btn" type="button" data-target="alertsSection"><span>▣</span> Alerts <small id="alertCount">0</small></button>
+          <button class="nav-btn" type="button" data-route="report.html"><span>☰</span> Reports</button>
+          <button class="nav-btn" type="button" data-target="simulationSection"><span>◈</span> Simulation</button>
+          <button class="nav-btn" type="button" data-action="settings"><span>⚙</span> Settings</button>
         </div>
 
         <div class="sidebar-footer">
@@ -43,6 +43,7 @@
           <div class="crumb">Workspace / <strong>Command Center</strong></div>
           <div class="status-group">
             <div class="status-pill"><span class="pulse"></span> System online</div>
+            <button class="small-btn" type="button" id="refreshDashboardBtn">Refresh</button>
             <button class="small-btn primary" type="button" id="dashboardReportBtn">Generate report</button>
             <button class="small-btn" type="button" id="logoutBtn">Sign out</button>
             <div class="user-badge">AI</div>
@@ -50,15 +51,15 @@
         </header>
 
         <div class="dashboard-grid">
-          <section class="panel">
+          <section class="panel" id="overviewSection">
             <div class="panel-head">
               <div class="panel-title-wrap">
                 <div class="panel-label">Threat intelligence platform</div>
                 <h2 class="panel-title">Cyberstalking behaviour detector</h2>
               </div>
               <div class="panel-tools">
-                <button class="small-btn primary" type="button" onclick="location.href='report.html'">Run simulation</button>
-                <button class="small-btn" type="button">Investigate</button>
+                <button class="small-btn primary" type="button" data-action="run-analysis">Run analysis</button>
+                <button class="small-btn" type="button" data-action="investigate">Investigate</button>
               </div>
             </div>
             <div class="report-body">
@@ -98,12 +99,11 @@
                   </div>
                   <div class="brief-box">
                     <div class="brief-label">System interpretation</div>
-                    <h3>Escalation is sustained</h3>
-                    <p>Signal overlap indicates persistent contact attempts, repeated re-engagement, and a concentrated post-block escalation pattern.</p>
-                    <ul class="brief-list">
-                      <li><span>Contact persistence</span><span>High</span></li>
-                      <li><span>Risk acceleration</span><span>Active</span></li>
-                      <li><span>Cross-account correlation</span><span>Moderate</span></li>
+                    <h3 id="liveInsightTitle">Awaiting analysis</h3>
+                    <p id="liveInsightText">Run an analysis to generate an insight from the current observation dataset.</p>
+                    <ul class="brief-list" id="liveInsightFactors">
+                      <li><span>Observation status</span><span>Sample data</span></li>
+                      <li><span>Human review</span><span>Required</span></li>
                     </ul>
                   </div>
                 </div>
@@ -111,22 +111,22 @@
             </div>
           </section>
 
-          <section class="stats-grid" aria-label="dashboard statistics">
+          <section class="stats-grid" id="statsSection" aria-label="dashboard statistics">
             <article class="stat-card red">
               <div class="stat-label">Total events</div>
-              <div class="stat-value"><strong id="totalEvents">1284</strong><span class="stat-note">demo</span></div>
+              <div class="stat-value"><strong id="totalEvents">0</strong><span class="stat-note">observed</span></div>
             </article>
             <article class="stat-card blue">
               <div class="stat-label">Suspicious events</div>
-              <div class="stat-value"><strong id="suspiciousEvents">217</strong><span class="stat-note">+12%</span></div>
+              <div class="stat-value"><strong id="suspiciousEvents">0</strong><span class="stat-note">flagged</span></div>
             </article>
             <article class="stat-card red">
               <div class="stat-label">High-risk events</div>
-              <div class="stat-value"><strong id="highRiskEvents">43</strong><span class="stat-note">urgent</span></div>
+              <div class="stat-value"><strong id="highRiskEvents">0</strong><span class="stat-note">unresolved</span></div>
             </article>
             <article class="stat-card purple">
               <div class="stat-label">Behaviour clusters</div>
-              <div class="stat-value"><strong id="clusterCount">12</strong><span class="stat-note">active</span></div>
+              <div class="stat-value"><strong id="clusterCount">0</strong><span class="stat-note">detected</span></div>
             </article>
             <article class="stat-card green">
               <div class="stat-label">Active cases</div>
@@ -134,11 +134,38 @@
             </article>
             <article class="stat-card blue">
               <div class="stat-label">System confidence</div>
-              <div class="stat-value"><strong id="confidenceLevel">94%</strong><span class="stat-note">AI</span></div>
+              <div class="stat-value"><strong id="confidenceLevel">0%</strong><span class="stat-note">coverage</span></div>
             </article>
           </section>
 
-          <section class="main-grid">
+          <section class="panel workflow-panel" id="analysisSection">
+            <div class="panel-head">
+              <div class="panel-title-wrap"><div class="panel-label">Explainable triage</div><h2 class="panel-title">Observation dataset</h2></div>
+              <span class="data-stamp" id="lastAnalysisAt">Loading saved analysis</span>
+            </div>
+            <form class="observation-form" id="analysisForm">
+              <div class="input-grid">
+                <label class="form-control">Subject / profile<input id="subjectInput" name="subject" maxlength="100" required /></label>
+                <label class="form-control">Observation period (days)<input id="daysInput" name="observationDays" type="number" min="1" max="90" required /></label>
+                <label class="form-control">Messages per hour<input id="messagesInput" name="messagesPerHour" type="number" min="0" max="300" required /></label>
+                <label class="form-control">Contact attempts<input id="attemptsInput" name="contactAttempts" type="number" min="0" max="500" required /></label>
+                <label class="form-control">Distinct accounts<input id="accountsInput" name="distinctAccounts" type="number" min="1" max="30" required /></label>
+                <label class="form-control">Contacts after block<input id="postBlockInput" name="postBlockContacts" type="number" min="0" max="500" required /></label>
+                <label class="form-control">Suspicious links reported<input id="linksInput" name="suspiciousLinks" type="number" min="0" max="100" required /></label>
+                <label class="form-control">Profile visits<input id="visitsInput" name="profileVisits" type="number" min="0" max="1000" required /></label>
+                <label class="form-control form-control-range">Escalation rate <output id="escalationOutput">0%</output><input id="escalationInput" name="escalationRate" type="range" min="0" max="100" /></label>
+                <label class="form-control form-control-wide">Analyst notes<textarea id="analystNotesInput" name="analystNotes" maxlength="2000" rows="3"></textarea></label>
+              </div>
+              <div class="form-actions">
+                <button class="small-btn primary" type="submit" id="analyzeBtn">Run analysis</button>
+                <button class="small-btn" type="button" id="loadSampleBtn">Restore sample dataset</button>
+                <button class="small-btn" type="button" id="clearInputsBtn">Clear inputs</button>
+                <span class="form-hint">Synthetic observations only. Results support human review and do not establish intent.</span>
+              </div>
+            </form>
+          </section>
+
+          <section class="main-grid" id="graphSection">
             <article class="panel">
               <div class="panel-head">
                 <div class="panel-title-wrap">
@@ -146,13 +173,12 @@
                   <h2 class="panel-title">Live activity</h2>
                 </div>
                 <div class="panel-tools">
-                  <button class="small-btn primary" type="button">Zoom</button>
-                  <button class="small-btn" type="button">Reset</button>
-                  <select class="tiny-select" aria-label="Graph time range">
+                  <button class="small-btn primary" type="button" id="zoomChartBtn">Zoom</button>
+                  <button class="small-btn" type="button" id="resetChartBtn">Reset</button>
+                  <select class="tiny-select" id="chartRangeSelect" aria-label="Graph time range">
                     <option>24H</option>
                     <option selected>7D</option>
                     <option>30D</option>
-                    <option>Custom</option>
                   </select>
                 </div>
               </div>
@@ -165,7 +191,7 @@
               </div>
             </article>
 
-            <aside class="panel risk-panel" aria-label="Threat risk assessment">
+            <aside class="panel risk-panel" id="riskSection" aria-label="Threat risk assessment">
               <div class="panel-head">
                 <div class="panel-title-wrap">
                   <div class="panel-label">Risk intelligence</div>
@@ -178,37 +204,31 @@
                     <div class="ring-value"><strong id="threatRisk">87</strong><small>%</small></div>
                   </div>
                   <div class="risk-text">
-                    <div class="risk-level">High Risk</div>
-                    <div class="risk-caption">Simulated behavioural indicators suggest repeated contact attempts and elevated block-evasion patterns.</div>
+                    <div class="risk-level" id="riskSeverity">Loading</div>
+                    <div class="risk-caption" id="riskCaption">Risk is calculated from the supplied observation fields.</div>
                   </div>
                 </div>
                 <div class="risk-bar"><span id="riskBarFill"></span></div>
                 <div class="risk-scale"><span>Low</span><span>Moderate</span><span>Elevated</span></div>
 
-                <div class="factor-list">
-                  <div class="factor"><span class="factor-name">Message Frequency</span><span class="factor-value">82%</span><div class="factor-track"><span style="width:82%"></span></div></div>
-                  <div class="factor"><span class="factor-name">Repeated Contact</span><span class="factor-value">76%</span><div class="factor-track"><span style="width:76%"></span></div></div>
-                  <div class="factor"><span class="factor-name">Account Switching</span><span class="factor-value">64%</span><div class="factor-track"><span style="width:64%"></span></div></div>
-                  <div class="factor"><span class="factor-name">Block Evasion</span><span class="factor-value">91%</span><div class="factor-track"><span style="width:91%"></span></div></div>
-                  <div class="factor"><span class="factor-name">Escalation Pattern</span><span class="factor-value">79%</span><div class="factor-track"><span style="width:79%"></span></div></div>
-                </div>
+                <div class="factor-list" id="riskFactors"></div>
               </div>
             </aside>
           </section>
 
-          <section class="main-grid">
+          <section class="main-grid" id="alertsSection">
             <article class="panel">
               <div class="panel-head">
                 <div class="panel-title-wrap">
                   <div class="panel-label">Alert center</div>
                   <h2 class="panel-title">Live alerts</h2>
                 </div>
+                <div class="panel-tools">
+                  <input class="inline-search" id="alertSearch" type="search" placeholder="Search alerts" aria-label="Search alerts" />
+                  <select class="tiny-select" id="alertSeverityFilter" aria-label="Filter alerts by severity"><option value="All">All severities</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select>
+                </div>
               </div>
-              <div class="alert-list">
-                <div class="alert-item"><span class="alert-pill high">High</span><div class="alert-body"><strong>Repeated contact detected</strong><div class="alert-meta">02:14:13 • Event ID 4018 • Confidence 94%</div></div><div class="alert-actions"><button class="small-btn" type="button">View</button></div></div>
-                <div class="alert-item"><span class="alert-pill high">High</span><div class="alert-body"><strong>Multiple accounts correlated</strong><div class="alert-meta">01:44:09 • Event ID 3981 • Confidence 90%</div></div><div class="alert-actions"><button class="small-btn" type="button">Investigate</button></div></div>
-                <div class="alert-item"><span class="alert-pill medium">Medium</span><div class="alert-body"><strong>Contact attempts increased</strong><div class="alert-meta">00:58:13 • Event ID 3910 • Confidence 82%</div></div><div class="alert-actions"><button class="small-btn" type="button">Review</button></div></div>
-              </div>
+              <div class="alert-list" id="alertList" aria-live="polite"></div>
             </article>
 
             <article class="panel">
@@ -220,18 +240,57 @@
               </div>
               <div class="report-body">
                 <div class="preview-box">
-                  <h4>Case ID: CS-2048</h4>
-                  <p>High-risk behavioural cluster linked to repeated contact attempts after lockout periods. Entity correlation indicates elevated confidence in cross-account patterning.</p>
+                  <h4 id="caseSnapshotTitle">Case overview</h4>
+                  <p id="caseSnapshotText">Case details will update with the saved analysis.</p>
                 </div>
                 <div class="preview-box">
                   <h4>Recommended actions</h4>
                   <ul>
-                    <li>Validate sequence of after-block contact attempts.</li>
-                    <li>Review account mapping and device overlap.</li>
-                    <li>Escalate to human investigator for pattern confirmation.</li>
+                    <li>Preserve relevant source records and timestamps.</li>
+                    <li>Review each contributing indicator and its source.</li>
+                    <li>Have a human investigator validate context.</li>
                   </ul>
                 </div>
               </div>
+            </article>
+          </section>
+
+          <section class="main-grid" id="timelineSection">
+            <article class="panel timeline-panel">
+              <div class="panel-head"><div class="panel-title-wrap"><div class="panel-label">Observed events</div><h2 class="panel-title">Activity timeline</h2></div><button class="small-btn" type="button" id="exportTimelineBtn">Export timeline</button></div>
+              <div class="timeline-wrap" id="timelineList" aria-live="polite"></div>
+            </article>
+            <article class="panel case-panel" id="caseSection">
+              <div class="panel-head"><div class="panel-title-wrap"><div class="panel-label">Investigation</div><h2 class="panel-title">Case status</h2></div><button class="small-btn" type="button" id="exportCaseBtn">Export case</button></div>
+              <div class="report-body">
+                <div class="preview-box"><h4 id="caseIdLabel">Case</h4><p id="caseStatusLabel">Loading</p><p id="caseUpdatedLabel"></p></div>
+                <label class="form-control">Investigation status<select id="caseStatusSelect"><option>Open</option><option>Monitoring</option><option>Closed</option></select></label>
+                <button class="small-btn" type="button" id="saveCaseStatusBtn">Save case status</button>
+                <form id="caseNoteForm"><label class="form-control">Analyst note<textarea id="caseNoteInput" maxlength="2000" rows="3" required></textarea></label><button class="small-btn primary" type="submit">Add note</button></form>
+                <div id="caseNotesList" class="case-notes-list"></div>
+              </div>
+            </article>
+          </section>
+
+          <section class="main-grid" id="evidenceSection">
+            <article class="panel evidence-panel">
+              <div class="panel-head"><div class="panel-title-wrap"><div class="panel-label">Evidence vault</div><h2 class="panel-title">Digital evidence</h2></div><button class="small-btn primary" type="button" data-action="add-evidence">Add evidence</button></div>
+              <div class="evidence-list" id="evidenceList" aria-live="polite"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div class="panel-title-wrap"><div class="panel-label">Analysis output</div><h2 class="panel-title">Detected patterns</h2></div></div>
+              <div class="report-body" id="patternList"></div>
+            </article>
+          </section>
+
+          <section class="main-grid" id="simulationSection">
+            <article class="panel">
+              <div class="panel-head"><div class="panel-title-wrap"><div class="panel-label">Scenario simulation</div><h2 class="panel-title">Current observation inputs</h2></div></div>
+              <div class="report-body"><p class="form-hint">The simulator uses the values in the observation dataset above and the same deterministic scoring rules. It does not contact or monitor external accounts.</p><button class="small-btn primary" type="button" id="runSimulationBtn">Run current scenario</button></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div class="panel-title-wrap"><div class="panel-label">Alert distribution</div><h2 class="panel-title">Severity overview</h2></div></div>
+              <div class="chart-wrap severity-chart-wrap"><canvas id="severityChart" aria-label="Alert distribution by severity"></canvas></div>
             </article>
           </section>
         </div>
@@ -239,6 +298,8 @@
     </div>
 
     <div class="toast" id="toast">Dashboard loaded.</div>
-    <script src="script.js"></script>
+    <dialog class="app-dialog" id="detailDialog" aria-labelledby="dialogTitle"><div class="dialog-head"><h2 id="dialogTitle">Details</h2><button class="small-btn" type="button" data-close-dialog aria-label="Close details">Close</button></div><div class="dialog-content" id="dialogContent"></div><div class="dialog-actions" id="dialogActions"></div></dialog>
+    <dialog class="app-dialog" id="evidenceDialog" aria-labelledby="evidenceDialogTitle"><form id="evidenceForm"><div class="dialog-head"><h2 id="evidenceDialogTitle">Add evidence</h2><button class="small-btn" type="button" data-close-dialog aria-label="Close evidence form">Close</button></div><div class="dialog-content dialog-form"><label class="form-control">Evidence title<input id="evidenceTitleInput" maxlength="120" required /></label><label class="form-control">Evidence type<select id="evidenceTypeInput"><option>Message</option><option>Account</option><option>Event sequence</option><option>URL</option><option>Other</option></select></label><label class="form-control">Source<input id="evidenceSourceInput" maxlength="120" required /></label><label class="form-control">Description / reference<textarea id="evidenceDescriptionInput" maxlength="2000" rows="4" required></textarea></label></div><div class="dialog-actions"><button class="small-btn" type="button" data-close-dialog>Cancel</button><button class="small-btn primary" type="submit">Save evidence</button></div></form></dialog>
+    <script src="app.js"></script>
   </body>
 </html>

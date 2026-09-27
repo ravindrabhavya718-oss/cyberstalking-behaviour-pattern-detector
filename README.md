@@ -1,37 +1,48 @@
 # CYBERSTALK Behaviour Pattern Detector
 
-A futuristic cybersecurity dashboard prototype for behavioural threat analysis and digital risk monitoring.
+A local demonstration workspace for explainable, defensive cyberstalking behaviour triage. It ships with synthetic observations and does not collect data from real accounts or platforms.
 
 ## Included pages
-- Landing page
-- Login screen
-- Command dashboard
-- Report generation view
+- Secure access (`login.html`)
+- Data-driven command dashboard (`dashboard.html`)
+- Timestamped report builder (`report.html`)
 
 ## Tech stack
 - HTML, CSS, and browser JavaScript
-- Node.js HTTP server with cookie sessions
-- JSON file persistence in the local `data/` directory
+- Node.js HTTP server (no external runtime dependencies)
+- Explainable weighted risk scoring with deterministic results
+- Per-analyst local JSON persistence in `data/db.json`
 
 ## Run locally
 
-Install Node.js 18 or newer, then run:
+Install Node.js 18 or newer. From the project folder, run:
 
 ```bash
 cd "c:\Users\ravin\OneDrive\Desktop\cyberstalking behaviour pattern"
 npm start
 ```
 
-Then open:
-- http://localhost:8000/login.html
+If PowerShell blocks `npm.ps1`, run `npm.cmd start` instead. Keep the terminal open while using the app. Stop the server with Ctrl+C.
 
-## Notes
+Then open:
+- http://localhost:8000/ (opens secure access)
+
+The first sign-in with a new email creates a local analyst account. Passwords must contain at least 8 characters. The **Demo access** button uses the local account `demo@cyberstalk.local`.
+
+Run the scoring and input-validation tests with:
+
+```bash
+npm test
+```
+
 ## Backend behavior
 
 - The first valid login creates a local analyst account. Later logins verify the stored password hash.
 - Sessions use an HttpOnly cookie and expire after 24 hours.
-- Dashboard statistics are served by `GET /api/dashboard`.
-- Reports are saved by `POST /api/reports` and can be listed with `GET /api/reports`.
+- `POST /api/analyze` calculates a deterministic score from the submitted observations and saves the result, events, and generated alerts.
+- `GET /api/dashboard` returns the current case state and statistics.
+- Evidence, alert reviews/resolution, case status, and analyst notes are persisted locally.
+- Reports are saved by `POST /api/reports`, listed with `GET /api/reports`, and individually retrieved with `GET /api/reports/:id`.
 - `data/db.json` is generated at runtime and ignored by Git.
 
-This remains a local demonstration system. It does not connect to real intelligence feeds and should not be used as a production security service without a proper database, password policy, CSRF protection, HTTPS, and authorization model.
+Risk levels are triage signals only, not evidence of intent or a substitute for investigation. This local demo is not a production service; production deployment requires a managed database, hardened authentication/session storage, HTTPS, CSRF defenses, authorization, audit controls, and a security review.

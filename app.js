@@ -23,6 +23,7 @@ function showToast(message, type = 'info') {
 
 async function apiRequest(route, options = {}) {
   let response;
+  if (window.location.protocol === 'file:' && window.cyberstalkOffline) return window.cyberstalkOffline(route, options);
   try {
     response = await fetch(route, {
       credentials: 'same-origin',

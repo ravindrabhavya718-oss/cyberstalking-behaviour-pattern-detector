@@ -23,7 +23,8 @@ function showToast(message, type = 'info') {
 
 async function apiRequest(route, options = {}) {
   let response;
-  if (window.location.protocol === 'file:' && window.cyberstalkOffline) return window.cyberstalkOffline(route, options);
+  const offlineMode = window.location.protocol === 'file:' || window.cyberstalkOfflineMode || window.sessionStorage?.getItem('cyberstalkOfflineMode') === 'true';
+  if (offlineMode && window.cyberstalkOffline) return window.cyberstalkOffline(route, options);
   try {
     response = await fetch(route, {
       credentials: 'same-origin',
@@ -31,8 +32,17 @@ async function apiRequest(route, options = {}) {
       headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}) }
     });
   } catch (error) {
-    if (window.cyberstalkOffline) return window.cyberstalkOffline(route, options);
+    if (window.cyberstalkOffline) {
+      window.cyberstalkOfflineMode = true;
+      window.sessionStorage?.setItem('cyberstalkOfflineMode', 'true');
+      return window.cyberstalkOffline(route, options);
+    }
     throw error;
+  }
+  if ((response.status === 404 || response.status === 405) && window.cyberstalkOffline) {
+    window.cyberstalkOfflineMode = true;
+    window.sessionStorage?.setItem('cyberstalkOfflineMode', 'true');
+    return window.cyberstalkOffline(route, options);
   }
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);

@@ -22,11 +22,17 @@ function showToast(message, type = 'info') {
 }
 
 async function apiRequest(route, options = {}) {
-  const response = await fetch(route, {
-    credentials: 'same-origin',
-    ...options,
-    headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}) }
-  });
+  let response;
+  try {
+    response = await fetch(route, {
+      credentials: 'same-origin',
+      ...options,
+      headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}) }
+    });
+  } catch (error) {
+    if (window.cyberstalkOffline) return window.cyberstalkOffline(route, options);
+    throw error;
+  }
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(payload.error || `Request failed (${response.status}).`);
   return payload;

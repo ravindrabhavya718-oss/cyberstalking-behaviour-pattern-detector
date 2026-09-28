@@ -29,6 +29,8 @@ Then open:
 
 The first sign-in with a new email creates a local analyst account. Passwords must contain at least 8 characters. The **Demo access** button uses the local account `demo@cyberstalk.local`.
 
+The pages also work offline: open `login.html` directly when the server is unavailable. Offline users, sessions, analysis, evidence, case updates, and reports are stored in that browser's local storage. Data created offline is separate from the server's `data/db.json` and is not automatically synchronized later.
+
 Run the scoring and input-validation tests with:
 
 ```bash

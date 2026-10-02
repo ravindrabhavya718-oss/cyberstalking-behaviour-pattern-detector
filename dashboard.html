@@ -50,6 +50,19 @@
           </div>
         </header>
 
+        <section class="runtime-strip" aria-label="Application status">
+          <div class="runtime-item" data-state="ready"><span class="runtime-light"></span><span class="runtime-label">System status</span><strong id="runtimeSystemStatus">Loading</strong></div>
+          <div class="runtime-item" data-state="waiting"><span class="runtime-light"></span><span class="runtime-label">Analyst session</span><strong id="runtimeSessionStatus">Checking</strong></div>
+          <div class="runtime-item" data-state="waiting"><span class="runtime-light"></span><span class="runtime-label">Analysis engine</span><strong id="runtimeAnalysisStatus">Loading</strong></div>
+          <div class="runtime-item" data-state="ready"><span class="runtime-light"></span><span class="runtime-label">Data connection</span><strong id="runtimeDataStatus">Checking</strong></div>
+        </section>
+        <div class="demo-feed" id="demoEventFeed" aria-label="Saved events or visual demonstration feed">
+          <span class="demo-feed-state" id="demoFeedState">VISUAL DEMO</span>
+          <time class="demo-feed-time" id="demoFeedTime">--:--:--</time>
+          <span class="demo-feed-message" id="demoFeedMessage">Preparing telemetry view</span>
+          <span class="demo-feed-source" id="demoFeedSource">NOT CASE DATA</span>
+        </div>
+
         <div class="dashboard-grid">
           <section class="panel" id="overviewSection">
             <div class="panel-head">
@@ -182,12 +195,16 @@
                   </select>
                 </div>
               </div>
-              <div class="chart-wrap">
+              <div class="chart-wrap telemetry-chart-wrap">
                 <canvas id="activityChart" aria-label="Behaviour event graph"></canvas>
+                <canvas id="demoTelemetryChart" class="telemetry-overlay" aria-hidden="true"></canvas>
+                <span class="telemetry-demo-tag" id="telemetryDemoLabel">DEMO VISUAL TRACE / NOT CASE DATA</span>
+                <span class="telemetry-tooltip" id="telemetryTooltip" role="status" hidden></span>
               </div>
               <div class="legend">
                 <span class="legend-item"><span class="legend-swatch"></span> Contact attempts</span>
                 <span class="legend-item"><span class="legend-swatch alt"></span> Block events</span>
+                <span class="legend-item"><span class="legend-swatch demo"></span> Demo visual trace</span>
               </div>
             </article>
 

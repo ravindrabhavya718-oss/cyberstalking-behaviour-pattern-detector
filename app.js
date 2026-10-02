@@ -10,6 +10,15 @@ let selectedReport = null;
 let activeAlertFilter = 'All';
 let zoomed = false;
 let reportSaving = false;
+let demoFeedIndex = 0;
+let demoFeedTimer = null;
+
+const DEMO_FEED_MESSAGES = [
+  'Visual trace sample advanced',
+  'Telemetry view refreshed',
+  'Network scene frame rendered',
+  'Interface signal pulse received'
+];
 
 function showToast(message, type = 'info') {
   const toast = document.getElementById('toast');
@@ -143,10 +152,75 @@ function renderStats() {
   const stats = appState.stats;
   for (const key of ['totalEvents', 'suspiciousEvents', 'highRiskEvents', 'clusterCount', 'activeCases', 'confidenceLevel']) {
     const element = document.getElementById(key);
-    if (element) element.textContent = key === 'activeCases' ? String(stats[key]).padStart(2, '0') : `${stats[key]}${key === 'confidenceLevel' ? '%' : ''}`;
+    if (!element) continue;
+    const value = key === 'activeCases' ? String(stats[key]).padStart(2, '0') : `${stats[key]}${key === 'confidenceLevel' ? '%' : ''}`;
+    if (element.textContent === value) continue;
+    element.textContent = value;
+    element.classList.remove('value-updated');
+    requestAnimationFrame(() => element.classList.add('value-updated'));
+    setTimeout(() => element.classList.remove('value-updated'), 650);
   }
   const alertCount = document.getElementById('alertCount');
   if (alertCount) alertCount.textContent = String(appState.alerts.filter((alert) => alert.status === 'new').length);
+}
+
+function renderRuntimeStatus() {
+  const offline = window.cyberstalkOfflineMode || window.location.protocol === 'file:';
+  const patterns = appState?.analysis?.patterns?.length || 0;
+  const values = [
+    ['runtimeSystemStatus', 'Online', 'ready'],
+    ['runtimeSessionStatus', currentUser ? 'Authenticated' : 'Pending', currentUser ? 'ready' : 'waiting'],
+    ['runtimeAnalysisStatus', appState?.analysis ? `Ready / ${patterns} patterns` : 'Pending', appState?.analysis ? 'ready' : 'waiting'],
+    ['runtimeDataStatus', offline ? 'Offline cache' : 'Local API', offline ? 'waiting' : 'ready']
+  ];
+  values.forEach(([id, text, state]) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+    element.textContent = text;
+    element.closest('.runtime-item')?.setAttribute('data-state', state);
+  });
+}
+
+function renderDemoEventFeed() {
+  const feed = document.getElementById('demoEventFeed');
+  const state = document.getElementById('demoFeedState');
+  const timestamp = document.getElementById('demoFeedTime');
+  const message = document.getElementById('demoFeedMessage');
+  const source = document.getElementById('demoFeedSource');
+  if (!feed || !state || !timestamp || !message || !source) return;
+
+  const events = appState?.events || [];
+  const event = events.length ? events[demoFeedIndex % events.length] : null;
+  const now = new Date();
+  feed.dataset.mode = event ? 'saved' : 'demo';
+  state.textContent = event ? 'SAVED EVENT' : 'VISUAL DEMO';
+  timestamp.dateTime = event?.timestamp || now.toISOString();
+  timestamp.textContent = new Date(timestamp.dateTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  message.textContent = event ? event.title : DEMO_FEED_MESSAGES[demoFeedIndex % DEMO_FEED_MESSAGES.length];
+  source.textContent = event ? `${event.severity} · ${event.status}` : 'NOT CASE DATA';
+}
+
+function bindDemoEventFeed() {
+  renderDemoEventFeed();
+  const feed = document.getElementById('demoEventFeed');
+  if (!feed) return;
+
+  const schedule = () => {
+    clearTimeout(demoFeedTimer);
+    if (document.hidden) return;
+    demoFeedTimer = setTimeout(() => {
+      feed.classList.add('is-updating');
+      setTimeout(() => {
+        demoFeedIndex += 1;
+        renderDemoEventFeed();
+        feed.classList.remove('is-updating');
+      }, 150);
+      schedule();
+    }, 6500);
+  };
+
+  document.addEventListener('visibilitychange', schedule);
+  schedule();
 }
 
 function renderRisk() {
@@ -161,6 +235,7 @@ function renderRisk() {
   const severity = document.getElementById('riskSeverity');
   severity.textContent = analysis.severity;
   severity.dataset.severity = analysis.severity.toLowerCase();
+  document.getElementById('riskSection').dataset.severity = analysis.severity.toLowerCase();
   document.getElementById('riskCaption').textContent = `Explainable score from ${analysis.indicators.length} weighted indicators. Confidence ${analysis.confidence}%. Human review required.`;
 
   const factors = document.getElementById('riskFactors');
@@ -380,6 +455,169 @@ function drawActivityChart() {
   }
 }
 
+function bindTelemetryGraph() {
+  const canvas = document.getElementById('demoTelemetryChart');
+  const tooltip = document.getElementById('telemetryTooltip');
+  if (!canvas) return;
+
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile = window.matchMedia('(max-width: 620px)').matches;
+  const sampleCount = mobile ? 42 : 78;
+  const samples = Array.from({ length: sampleCount }, (_, index) => Math.max(0.12, Math.min(0.84,
+    0.38 + Math.sin(index * 0.21) * 0.13 + Math.sin(index * 0.067) * 0.11 + Math.random() * 0.08
+  )));
+  let lastFrame = 0;
+  let lastSample = performance.now();
+  let frameId = 0;
+  let pointerIndex = -1;
+
+  function paint(timestamp) {
+    if (document.hidden) {
+      frameId = 0;
+      return;
+    }
+    const frameInterval = mobile ? 1000 / 24 : 1000 / 36;
+    if (timestamp - lastFrame < frameInterval && !reducedMotion) {
+      frameId = requestAnimationFrame(paint);
+      return;
+    }
+    lastFrame = timestamp;
+
+    if (!reducedMotion && timestamp - lastSample >= (mobile ? 850 : 560)) {
+      const previous = samples[samples.length - 1];
+      const spike = Math.random() < 0.07 ? 0.24 + Math.random() * 0.35 : 0;
+      samples.shift();
+      samples.push(Math.max(0.08, Math.min(0.97, previous * 0.54 + 0.18 + Math.random() * 0.18 + spike)));
+      lastSample = timestamp;
+    }
+
+    const bounds = canvas.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) {
+      if (!reducedMotion) frameId = requestAnimationFrame(paint);
+      return;
+    }
+    const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.15 : 1.5);
+    const pixelWidth = Math.round(bounds.width * dpr);
+    const pixelHeight = Math.round(bounds.height * dpr);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.clearRect(0, 0, bounds.width, bounds.height);
+
+    const pad = { top: 18, right: 18, bottom: 30, left: 34 };
+    const width = bounds.width - pad.left - pad.right;
+    const height = bounds.height - pad.top - pad.bottom;
+    const xAt = (index) => pad.left + width * index / Math.max(1, samples.length - 1);
+    const yAt = (value) => pad.top + height * (1 - value);
+
+    context.save();
+    context.setLineDash([2, 7]);
+    context.lineWidth = 1;
+    context.strokeStyle = 'rgba(108, 191, 205, 0.12)';
+    for (let index = 1; index < 5; index += 1) {
+      const y = pad.top + height * index / 5;
+      context.beginPath(); context.moveTo(pad.left, y); context.lineTo(bounds.width - pad.right, y); context.stroke();
+    }
+    const thresholdY = yAt(0.76);
+    context.setLineDash([5, 5]);
+    context.strokeStyle = 'rgba(255, 191, 111, 0.48)';
+    context.beginPath(); context.moveTo(pad.left, thresholdY); context.lineTo(bounds.width - pad.right, thresholdY); context.stroke();
+    context.setLineDash([]);
+    context.font = '8px sans-serif';
+    context.fillStyle = 'rgba(255, 208, 139, 0.78)';
+    context.textAlign = 'right';
+    context.fillText('DEMO THRESHOLD', bounds.width - pad.right, thresholdY - 5);
+    context.textAlign = 'left';
+    context.restore();
+
+    context.beginPath();
+    samples.forEach((value, index) => {
+      const x = xAt(index);
+      const y = yAt(value);
+      if (index === 0) context.moveTo(x, y); else context.lineTo(x, y);
+    });
+    context.lineTo(xAt(samples.length - 1), pad.top + height);
+    context.lineTo(xAt(0), pad.top + height);
+    context.closePath();
+    const area = context.createLinearGradient(0, pad.top, 0, pad.top + height);
+    area.addColorStop(0, 'rgba(79, 219, 209, 0.14)');
+    area.addColorStop(1, 'rgba(79, 219, 209, 0.005)');
+    context.fillStyle = area;
+    context.fill();
+
+    context.beginPath();
+    samples.forEach((value, index) => {
+      const x = xAt(index);
+      const y = yAt(value);
+      if (index === 0) context.moveTo(x, y); else context.lineTo(x, y);
+    });
+    context.lineWidth = 1.7;
+    context.strokeStyle = 'rgba(102, 229, 217, 0.82)';
+    context.shadowColor = 'rgba(83, 231, 215, 0.42)';
+    context.shadowBlur = 7;
+    context.stroke();
+    context.shadowBlur = 0;
+
+    const scanX = pad.left + ((timestamp * 0.000075) % 1) * width;
+    const scan = context.createLinearGradient(scanX - 15, 0, scanX + 15, 0);
+    scan.addColorStop(0, 'rgba(101, 236, 224, 0)');
+    scan.addColorStop(0.5, 'rgba(101, 236, 224, 0.1)');
+    scan.addColorStop(1, 'rgba(101, 236, 224, 0)');
+    context.fillStyle = scan;
+    context.fillRect(scanX - 15, pad.top, 30, height);
+
+    const activeIndex = samples.length - 1;
+    const activeX = xAt(activeIndex);
+    const activeY = yAt(samples[activeIndex]);
+    const pulse = reducedMotion ? 1 : 0.72 + Math.sin(timestamp * 0.005) * 0.2;
+    context.beginPath();
+    context.fillStyle = 'rgba(186, 255, 239, 0.92)';
+    context.arc(activeX, activeY, 3.2 * pulse, 0, Math.PI * 2);
+    context.fill();
+
+    if (pointerIndex >= 0) {
+      context.beginPath();
+      context.fillStyle = '#b5fff0';
+      context.arc(xAt(pointerIndex), yAt(samples[pointerIndex]), 4, 0, Math.PI * 2);
+      context.fill();
+    }
+
+    if (!reducedMotion) frameId = requestAnimationFrame(paint);
+  }
+
+  canvas.addEventListener('pointermove', (event) => {
+    const bounds = canvas.getBoundingClientRect();
+    const leftPad = 34;
+    const rightPad = 18;
+    const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left - leftPad) / Math.max(1, bounds.width - leftPad - rightPad)));
+    pointerIndex = Math.round(ratio * (samples.length - 1));
+    if (!tooltip) return;
+    tooltip.hidden = false;
+    tooltip.textContent = `Demo visual signal / ${Math.round(samples[pointerIndex] * 100)}% / not case data`;
+    tooltip.style.left = `${Math.max(8, Math.min(bounds.width - 220, event.clientX - bounds.left + 12))}px`;
+    tooltip.style.top = `${Math.max(8, event.clientY - bounds.top - 30)}px`;
+  });
+  canvas.addEventListener('pointerleave', () => {
+    pointerIndex = -1;
+    if (tooltip) tooltip.hidden = true;
+  });
+
+  frameId = requestAnimationFrame(paint);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(frameId);
+      frameId = 0;
+    } else if (!reducedMotion && !frameId) {
+      lastFrame = performance.now();
+      frameId = requestAnimationFrame(paint);
+    }
+  });
+}
+
 function drawSeverityChart() {
   const canvas = document.getElementById('severityChart');
   if (!canvas || !appState) return;
@@ -414,6 +652,8 @@ function drawSeverityChart() {
 
 function renderDashboard() {
   if (!appState) return;
+  renderRuntimeStatus();
+  renderDemoEventFeed();
   populateAnalysisForm(appState.analysis.inputs);
   renderStats(); renderRisk(); renderPatterns(); renderAlerts(); renderTimeline(); renderEvidence(); renderCase();
   drawActivityChart(); drawSeverityChart();
@@ -446,6 +686,11 @@ async function runAnalysis() {
   try {
     const inputs = getAnalysisInputs();
     button.disabled = true; button.textContent = 'Analyzing...';
+    const runtimeStatus = document.getElementById('runtimeAnalysisStatus');
+    if (runtimeStatus) {
+      runtimeStatus.textContent = 'Analyzing';
+      runtimeStatus.closest('.runtime-item')?.setAttribute('data-state', 'waiting');
+    }
     appState = await apiRequest('/api/analyze', { method: 'POST', body: JSON.stringify({ inputs }) });
     renderDashboard();
     showToast(`Analysis complete: ${appState.analysis.score}/100 · ${appState.analysis.severity}.`, 'success');
@@ -453,6 +698,11 @@ async function runAnalysis() {
     showToast(error.message, 'error');
   } finally {
     button.disabled = false; button.textContent = 'Run analysis';
+    if (appState) renderRuntimeStatus();
+    else {
+      const runtimeStatus = document.getElementById('runtimeAnalysisStatus');
+      if (runtimeStatus) runtimeStatus.textContent = 'Pending';
+    }
   }
 }
 
@@ -643,6 +893,8 @@ function bindNavigation() {
 }
 
 function bindDashboard() {
+  bindTelemetryGraph();
+  bindDemoEventFeed();
   document.getElementById('analysisForm')?.addEventListener('submit', (event) => { event.preventDefault(); runAnalysis(); });
   document.getElementById('loadSampleBtn')?.addEventListener('click', async () => {
     try {
@@ -784,7 +1036,112 @@ function registerGlobalDialogActions() {
   });
 }
 
+function injectCyberBackdrop() {
+  if (document.querySelector('.cyber-scene')) return;
+
+  const scene = document.createElement('div');
+  scene.className = 'cyber-scene';
+  scene.setAttribute('aria-hidden', 'true');
+  scene.innerHTML = `
+    <div class="grid-floor"></div>
+    <div class="hud-ring"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    <div class="data-stream"></div>
+    <div class="node"></div>
+    <div class="node"></div>
+    <div class="node"></div>
+    <div class="node"></div>
+    <div class="node"></div>
+    <div class="scanline"></div>
+    <div class="radar"></div>
+  `;
+  document.body.insertBefore(scene, document.body.firstChild);
+}
+
+function bindInteractiveDepth() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(pointer: fine)').matches) return;
+
+  const targets = document.querySelectorAll('.panel:not(.signal-panel), .stat-card, .login-card, .info-card');
+
+  targets.forEach((element) => {
+    const handlePointerMove = (event) => {
+      const rect = element.getBoundingClientRect();
+      const dx = (event.clientX - (rect.left + rect.width / 2)) / rect.width;
+      const dy = (event.clientY - (rect.top + rect.height / 2)) / rect.height;
+      const x = Math.max(-2, Math.min(2, dx * 4));
+      const y = Math.max(-2, Math.min(2, dy * -4));
+      element.style.setProperty('--pointer-x', `${((event.clientX - rect.left) / rect.width) * 100}%`);
+      element.style.setProperty('--pointer-y', `${((event.clientY - rect.top) / rect.height) * 100}%`);
+      element.style.transform = `perspective(1200px) rotateX(${y}deg) rotateY(${x}deg) translateY(-2px)`;
+    };
+
+    const reset = () => {
+      element.style.transform = '';
+      element.style.removeProperty('--pointer-x');
+      element.style.removeProperty('--pointer-y');
+    };
+
+    element.addEventListener('pointermove', handlePointerMove);
+    element.addEventListener('pointerleave', reset);
+    element.addEventListener('pointercancel', reset);
+  });
+}
+
+function bindControlLighting() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(pointer: fine)').matches) return;
+
+  document.querySelectorAll('.small-btn, .action-btn, .btn, .nav-btn').forEach((button) => {
+    button.addEventListener('pointermove', (event) => {
+      const rect = button.getBoundingClientRect();
+      button.style.setProperty('--pointer-x', `${((event.clientX - rect.left) / rect.width) * 100}%`);
+      button.style.setProperty('--pointer-y', `${((event.clientY - rect.top) / rect.height) * 100}%`);
+    });
+    button.addEventListener('pointerleave', () => {
+      button.style.removeProperty('--pointer-x');
+      button.style.removeProperty('--pointer-y');
+    });
+  });
+}
+
+function bindScrollReveals() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+
+  const targets = document.querySelectorAll(
+    '.login-visual-copy, .login-signal-panel, .login-form-content, .topbar, .runtime-strip, .demo-feed, .dashboard-grid > *, .dashboard-grid > .stats-grid > *, .dashboard-grid > .main-grid > *, .report-page > *, .stat-card, .signal-card'
+  );
+  if (!targets.length) return;
+
+  document.body.classList.add('scroll-reveals-enabled');
+  const observer = new IntersectionObserver((entries, activeObserver) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      activeObserver.unobserve(entry.target);
+    });
+  }, { rootMargin: '0px 0px -7% 0px', threshold: 0.08 });
+
+  targets.forEach((element, index) => {
+    element.classList.add('scroll-reveal');
+    element.style.setProperty('--reveal-delay', `${(index % 4) * 55}ms`);
+    observer.observe(element);
+  });
+}
+
+function startCyberWorld() {
+  import('./cyber-world.js')
+    .then(({ initCyberWorld }) => initCyberWorld(document.querySelector('.cyber-scene')))
+    .catch(() => document.body.classList.add('cyber-world-fallback'));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  injectCyberBackdrop();
+  startCyberWorld();
+  bindInteractiveDepth();
+  bindControlLighting();
+  bindScrollReveals();
   bindLogin();
   if (document.querySelector('.dashboard-grid')) { bindDashboard(); loadDashboard(); }
   if (document.getElementById('reportForm')) bindReportPage();
